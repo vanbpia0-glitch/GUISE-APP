@@ -6,12 +6,38 @@
 }
 
 .headerRow {
-  display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 20px;
-  max-width: 1100px;
   margin-bottom: 24px;
-  align-items: stretch;
+}
+
+.body {
+  display: grid;
+  grid-template-columns: 1fr 260px;
+  gap: 24px;
+  align-items: start;
+}
+
+.listGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  align-content: start;
+}
+
+.sideRail {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  position: sticky;
+  top: 0;
+}
+
+@media (max-width: 1080px) {
+  .body {
+    grid-template-columns: 1fr;
+  }
+  .listGrid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .titleRow {
@@ -68,24 +94,30 @@
 .overviewCard {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: var(--r-2xl);
-  padding: 18px 20px;
+  border-radius: var(--r-lg);
+  padding: 20px;
   box-shadow: var(--shadow-card);
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 14px;
+  text-align: center;
+}
+
+.overviewRing {
+  margin-bottom: 6px;
 }
 
 .overviewLabel {
   font-size: 10px;
+  font-weight: 700;
   color: var(--muted-2);
-  letter-spacing: 0.3px;
+  letter-spacing: 0.5px;
+  margin-bottom: 10px;
 }
 
 .overviewLine {
   font-size: 12px;
   color: var(--ink-soft);
-  margin-top: 5px;
   display: flex;
   align-items: center;
   gap: 5px;
@@ -107,16 +139,8 @@
   display: inline-block;
 }
 
-.list {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  max-width: 900px;
-  margin-bottom: 28px;
-}
-
 .card {
-  border-radius: var(--r-2xl);
+  border-radius: var(--r-lg);
   padding: 22px;
   box-shadow: var(--shadow-card-lg);
   cursor: pointer;
@@ -176,6 +200,20 @@
   letter-spacing: 0.3px;
 }
 
+.tickLabels {
+  position: relative;
+  height: 13px;
+  margin-bottom: 3px;
+}
+
+.tickLabel {
+  position: absolute;
+  transform: translateX(-50%);
+  font-size: 9px;
+  font-weight: 700;
+  opacity: 0.7;
+}
+
 .progressWrap {
   position: relative;
   margin-bottom: 12px;
@@ -228,6 +266,34 @@
   cursor: pointer;
 }
 
+.customBtn {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: var(--r-pill);
+  background: var(--ink);
+  color: white;
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.customAddBtn {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: var(--r-pill);
+  background: var(--ink);
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.cardChevron {
+  flex-shrink: 0;
+  opacity: 0.6;
+}
+
 .autoTag {
   font-size: 10px;
   font-weight: 600;
@@ -269,18 +335,26 @@
 }
 
 .achievedLink {
-  max-width: 900px;
   display: flex;
   align-items: center;
   gap: 8px;
   color: var(--muted-2);
   cursor: pointer;
-  padding: 10px 4px;
-  margin-bottom: 20px;
-  background: none;
-  border: none;
+  padding: 12px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-card);
   font-size: 13px;
   font-weight: 600;
+}
+
+.achievedRow {
+  font-size: 12.5px;
+  color: var(--muted);
+  background: var(--surface-tint);
+  border-radius: var(--r-md);
+  padding: 10px 12px;
 }
 
 .achievedIconBox {
@@ -294,10 +368,10 @@
 }
 
 .emptyState {
+  grid-column: 1 / -1;
   border: 2px dashed rgba(41, 39, 35, 0.15);
-  border-radius: var(--r-3xl);
+  border-radius: var(--r-xl);
   padding: 48px 24px;
-  max-width: 540px;
   text-align: center;
   background: rgba(255, 255, 255, 0.3);
 }
