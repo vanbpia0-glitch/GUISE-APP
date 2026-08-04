@@ -29,7 +29,7 @@ import {
 } from '../../lib/selectors';
 import { quarterDateRange, quarterLabel } from '../../lib/date';
 import { colorsFor } from '../../lib/contextColors';
-import { IconArrowsSort, IconFlag, IconFlame, IconPlus, IconTrophy } from '../../lib/icons';
+import { IconArrowsSort, IconFlag, IconFlame, IconGripVertical, IconPlus, IconTrophy } from '../../lib/icons';
 import Modal from '../../components/Modal';
 import AddGoalForm from '../../components/AddGoalForm';
 import AddBlockerForm from '../../components/AddBlockerForm';
@@ -90,23 +90,27 @@ export default function GoalsList() {
     dispatch({ type: 'REORDER_GOALS', payload: { orderedIds: reordered } });
   }
 
-  const achievements: { icon: JSX.Element; label: string }[] = [];
-  if (streak >= 2) achievements.push({ icon: <IconFlame size={17} color="white" />, label: `${streak}-day streak` });
+  const achievements: { icon: JSX.Element; label: string; bg: string }[] = [];
+  if (streak >= 2)
+    achievements.push({ icon: <IconFlame size={17} color="white" />, label: `${streak}-day streak`, bg: 'var(--grounds-base)' });
   if (completedThisWeek > 0)
     achievements.push({
       icon: <span style={{ color: 'white', fontWeight: 700 }}>{completedThisWeek}</span>,
       label: `blocks done this wk`,
+      bg: 'var(--sc-base)',
     });
   if (resolvedThisWeek > 0)
     achievements.push({
       icon: <IconFlag size={15} color="white" />,
       label: `${resolvedThisWeek} blocker${resolvedThisWeek > 1 ? 's' : ''} resolved`,
+      bg: 'var(--me-base)',
     });
   const bestGoal = quarterGoals
     .map((g) => ({ g, pct: goalProgressPct(state, g) }))
     .filter((x) => x.pct >= 75)
     .sort((a, b) => b.pct - a.pct)[0];
-  if (bestGoal) achievements.push({ icon: <IconTrophy size={15} color="white" />, label: `${bestGoal.g.title} at ${bestGoal.pct}%` });
+  if (bestGoal)
+    achievements.push({ icon: <IconTrophy size={15} color="var(--ink)" />, label: `${bestGoal.g.title} at ${bestGoal.pct}%`, bg: 'var(--van-base)' });
 
   function timelineBar(goal: Goal) {
     const { start, end } = quarterDateRange(goal.quarter);
@@ -145,7 +149,7 @@ export default function GoalsList() {
             <div className={styles.achievementsGrid}>
               {achievements.slice(0, 6).map((a, i) => (
                 <div className={styles.achievementTile} key={i}>
-                  <div className={styles.achievementIcon} style={{ background: 'rgba(255,255,255,0.12)' }}>
+                  <div className={styles.achievementIcon} style={{ background: a.bg }}>
                     {a.icon}
                   </div>
                   <div className={styles.achievementLabel}>{a.label}</div>
@@ -432,18 +436,25 @@ function SortableGoalCard({ goal, rank, onOpen }: { goal: Goal; rank: number; on
     <div
       ref={setNodeRef}
       style={style}
-      {...attributes}
-      {...listeners}
-      className={styles.sortableWrapper}
+      className={`${styles.sortableWrapper} ${isDragging ? styles.goalCardDragging : ''}`}
       data-testid="goal-card"
       data-goal-id={goal.id}
     >
       <button
-        className={`${styles.goalCard} ${isDragging ? styles.goalCardDragging : ''}`}
+        className={styles.goalCard}
         style={{ background: colors?.tint }}
         onClick={onOpen}
         type="button"
       >
+        <span
+          className={styles.dragHandle}
+          {...attributes}
+          {...listeners}
+          onClick={(e) => e.stopPropagation()}
+          aria-label="Drag to reorder"
+        >
+          <IconGripVertical size={14} color={colors?.mid || 'var(--muted-2)'} />
+        </span>
         <div className={styles.rankBadge} style={{ color: colors?.mid }}>
           {rank}
         </div>
