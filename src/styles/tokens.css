@@ -1,0 +1,66 @@
+:root {
+  /* Neutrals */
+  --ink: #292723;
+  --ink-soft: #4d4a44;
+  --muted: #736b66;
+  --muted-2: #928d86;
+  --muted-3: #aca9a5;
+  --faint: #c9c7c5;
+  --border: #e8ddd9;
+  --cream: #f7f4f2;
+  --surface: #ffffff;
+  --surface-tint: #f1efe8;
+  --page-bg: #ededea;
+  --canvas-bg: #f7f4f2;
+
+  /* Context: SC (orange) */
+  --sc-base: #ed7e1c;
+  --sc-tint: #ffeee2;
+  --sc-deep: #663600;
+  --sc-mid: #aa5500;
+  --sc-darkest: #432500;
+
+  /* Context: Grounds (green) */
+  --grounds-base: #7d944d;
+  --grounds-tint: #e5ead7;
+  --grounds-tint-2: #f2f5eb;
+  --grounds-deep: #29321a;
+  --grounds-mid: #5a6b38;
+
+  /* Context: Van (yellow) */
+  --van-base: #ffbd1a;
+  --van-tint: #fff4e0;
+  --van-deep: #4d3c00;
+  --van-mid: #705600;
+
+  /* Context: Me (purple) */
+  --me-base: #8978e3;
+  --me-tint: #f6f1ff;
+  --me-deep: #292350;
+  --me-mid: #3c357c;
+
+  /* Reflection "night" surface */
+  --night-bg: #3c357c;
+  --night-text: #f7f4f2;
+  --night-muted: #a694f5;
+  --night-faint: #ddd1ff;
+  --night-faint-2: #eae4ff;
+
+  /* Radii */
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-lg: 16px;
+  --r-xl: 20px;
+  --r-2xl: 22px;
+  --r-3xl: 26px;
+  --r-pill: 20px;
+
+  /* Shadows */
+  --shadow-card: 0 4px 20px rgba(41, 39, 35, 0.06);
+  --shadow-card-lg: 0 6px 22px rgba(41, 39, 35, 0.08);
+  --shadow-cta: 0 6px 16px rgba(41, 39, 35, 0.25);
+  --shadow-pop: 0 10px 24px rgba(237, 126, 28, 0.35);
+
+  --font-sans: 'Urbanist', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'Space Mono', ui-monospace, monospace;
+}

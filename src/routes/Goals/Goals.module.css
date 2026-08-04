@@ -1,0 +1,550 @@
+.page {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+  height: 100%;
+}
+
+.main {
+  flex: 1;
+  padding: 26px 32px;
+  overflow-y: auto;
+  background: var(--canvas-bg);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.eyebrow {
+  font-size: 11px;
+  color: var(--muted-2);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+  font-weight: 700;
+}
+
+.title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.addBtn {
+  font-size: 12px;
+  color: var(--sc-mid);
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+}
+
+.darkCard {
+  background: var(--ink);
+  border-radius: var(--r-lg);
+  padding: 22px;
+  margin-bottom: 16px;
+  color: white;
+}
+
+.darkCardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.darkCardTitle {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.darkCardMeta {
+  font-size: 12px;
+  color: var(--faint);
+}
+
+.achievementsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+  gap: 12px;
+}
+
+.achievementTile {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: var(--r-md);
+  padding: 16px 8px;
+  text-align: center;
+}
+
+.achievementIcon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 8px;
+}
+
+.achievementLabel {
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.emptyAchievements {
+  font-size: 12.5px;
+  color: var(--faint);
+  line-height: 1.5;
+}
+
+.statsTrio {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.statTile {
+  border-radius: var(--r-md);
+  padding: 14px;
+  text-align: center;
+}
+
+.statTileValue {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.statTileLabel {
+  font-size: 10px;
+  opacity: 0.9;
+}
+
+.priorityHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.priorityLabel {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted-2);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.reorderHint {
+  font-size: 11px;
+  color: var(--muted-2);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.priorityGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.goalCard {
+  border-radius: var(--r-md);
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  border: none;
+  text-align: left;
+  font-family: inherit;
+  width: 100%;
+}
+
+.goalCardDragging {
+  opacity: 0.5;
+}
+
+.rankBadge {
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.goalCardBody {
+  flex: 1;
+  min-width: 0;
+}
+
+.goalCardTitle {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.goalCardStatus {
+  font-size: 10px;
+}
+
+.blockerDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--sc-mid);
+  flex-shrink: 0;
+}
+
+.archiveLink {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted-2);
+  font-size: 12px;
+  margin-bottom: 20px;
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+.archivedList {
+  margin: -8px 0 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.archivedRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--muted);
+  padding: 8px 12px;
+  background: var(--surface-tint);
+  border-radius: var(--r-sm);
+}
+
+.timelineRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.timelineRow:last-child {
+  margin-bottom: 0;
+}
+
+.timelineGoalLabel {
+  font-size: 10px;
+  color: var(--faint);
+  width: 100px;
+  flex-shrink: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.timelineTrack {
+  flex: 1;
+  height: 20px;
+  position: relative;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 5px;
+}
+
+.timelineBar {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  padding-left: 8px;
+  min-width: 4px;
+}
+
+.timelineBarLabel {
+  font-size: 9px;
+  font-weight: 700;
+  color: white;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Right sidebar */
+.sidebar {
+  width: 300px;
+  flex-shrink: 0;
+  border-left: 1px solid var(--border);
+  padding: 26px 24px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.quarterCard {
+  text-align: center;
+  padding: 2px 0 4px;
+}
+
+.quarterHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.quarterHeaderLabel {
+  font-size: 11px;
+  color: var(--muted-2);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 700;
+}
+
+.streakBadge {
+  font-size: 11px;
+  color: var(--sc-mid);
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.quarterRingWrap {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 6px;
+}
+
+.quarterLegend {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+}
+
+.legendItem {
+  font-size: 10px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.legendDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.triageCard {
+  background: var(--ink);
+  border-radius: var(--r-lg);
+  padding: 20px;
+  color: white;
+}
+
+.triageLabel {
+  font-size: 11px;
+  color: var(--faint);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+  font-weight: 700;
+}
+
+.triageCount {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.triageStats {
+  display: flex;
+  gap: 20px;
+}
+
+.triageStatLabel {
+  font-size: 9px;
+  color: var(--faint);
+  margin-bottom: 2px;
+}
+
+.triageStatValue {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.blockerCard {
+  border-radius: var(--r-lg);
+  padding: 18px;
+  color: white;
+}
+
+.blockerCardTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 10px;
+  gap: 8px;
+}
+
+.blockerCardGoal {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  opacity: 0.9;
+}
+
+.blockerCardBadge {
+  font-size: 9px;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 3px 8px;
+  border-radius: 20px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.blockerCardDesc {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  line-height: 1.4;
+}
+
+.blockerCardVerb {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  opacity: 0.9;
+  margin-bottom: 12px;
+}
+
+.markHandledBtn {
+  width: 100%;
+  background: white;
+  border: none;
+  border-radius: 8px;
+  padding: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.flagBlockerBtn {
+  width: 100%;
+  background: transparent;
+  border: 1px dashed var(--faint);
+  color: var(--ink);
+  border-radius: var(--r-md);
+  padding: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-family: inherit;
+}
+
+.tintCard {
+  border-radius: var(--r-lg);
+  padding: 18px;
+}
+
+.tintCardTitle {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  margin-bottom: 12px;
+}
+
+.milestoneRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.milestoneRow:last-child {
+  margin-bottom: 0;
+}
+
+.milestoneLabel {
+  font-size: 11px;
+  flex: 1;
+}
+
+.milestoneMeta {
+  font-size: 9px;
+}
+
+.motivationBarTrack {
+  height: 8px;
+  background: rgba(41, 35, 80, 0.1);
+  border-radius: 20px;
+  overflow: hidden;
+  display: flex;
+  margin-bottom: 8px;
+}
+
+.motivationLegend {
+  display: flex;
+  justify-content: space-between;
+  font-size: 9px;
+}
+
+.pushFlag {
+  margin-top: 10px;
+  font-size: 10.5px;
+  line-height: 1.4;
+}
+
+.resolvedHistoryLink {
+  text-align: center;
+  font-size: 11px;
+  color: var(--muted-2);
+  padding: 6px;
+  background: none;
+  border: none;
+}
+
+.resolvedList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.resolvedRow {
+  font-size: 11px;
+  color: var(--muted);
+  background: var(--surface-tint);
+  border-radius: var(--r-sm);
+  padding: 8px 10px;
+}
+
+.emptyNote {
+  font-size: 11.5px;
+  color: var(--muted);
+  line-height: 1.5;
+}
