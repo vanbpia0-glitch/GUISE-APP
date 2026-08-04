@@ -12,7 +12,7 @@ import { CSS } from '@dnd-kit/utilities';
 import styles from './ContextsSettings.module.css';
 import { useStore } from '../../store/StoreContext';
 import { activeContexts, goalsByContext, hoursByContextThisWeek } from '../../lib/selectors';
-import { colorsFor, COLOR_RAMPS } from '../../lib/contextColors';
+import { colorsFor, COLOR_RAMPS, shadesFor } from '../../lib/contextColors';
 import { CONTEXT_ICONS, ContextIcon, IconArchive, IconGripVertical, IconPlus } from '../../lib/icons';
 import { relativeDayLabel } from '../../lib/date';
 import Modal from '../../components/Modal';
@@ -159,6 +159,11 @@ function SortableContextCard({ ctx, now }: { ctx: GuiseContext; now: Date }) {
   const [role, setRole] = useState(ctx.role_description || '');
   const [icon, setIcon] = useState(ctx.icon);
   const [colorKey, setColorKey] = useState(ctx.color_key);
+  const [iconExpanded, setIconExpanded] = useState(false);
+
+  const ICON_COLLAPSED_COUNT = 6;
+  const shownIcons = iconExpanded ? ICON_NAMES : ICON_NAMES.slice(0, ICON_COLLAPSED_COUNT);
+  const hiddenIconCount = ICON_NAMES.length - ICON_COLLAPSED_COUNT;
 
   const goalCount = goalsByContext(state, ctx.id).length;
   const systemCount = Object.values(state.systems).filter((s) => s.active && s.context_id === ctx.id).length;
@@ -212,7 +217,7 @@ function SortableContextCard({ ctx, now }: { ctx: GuiseContext; now: Date }) {
               Icon
             </div>
             <div className={styles.iconRow}>
-              {ICON_NAMES.map((n) => (
+              {shownIcons.map((n) => (
                 <button
                   key={n}
                   type="button"
@@ -222,6 +227,16 @@ function SortableContextCard({ ctx, now }: { ctx: GuiseContext; now: Date }) {
                   <ContextIcon name={n} size={16} color={icon === n ? colors.mid : 'var(--muted-2)'} />
                 </button>
               ))}
+              {hiddenIconCount > 0 && (
+                <button
+                  type="button"
+                  className={styles.iconMoreBtn}
+                  style={{ color: colors.mid }}
+                  onClick={() => setIconExpanded((v) => !v)}
+                >
+                  {iconExpanded ? 'Less' : `+${hiddenIconCount}`}
+                </button>
+              )}
             </div>
           </div>
 
@@ -239,6 +254,11 @@ function SortableContextCard({ ctx, now }: { ctx: GuiseContext; now: Date }) {
                   onClick={() => setColorKey(key)}
                   aria-label={key}
                 />
+              ))}
+            </div>
+            <div className={styles.rampStrip}>
+              {shadesFor(colorKey).map((shade, i) => (
+                <span key={i} className={styles.rampSwatch} style={{ background: shade }} />
               ))}
             </div>
           </div>
