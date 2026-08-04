@@ -73,30 +73,16 @@ export default function Dashboard() {
   const weekStart = startOfWeek(now);
   const weekDays = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
 
-  // Time-axis range for the "Upcoming activity" grid, derived from this
-  // week's actual Block times (padded an hour each side) rather than the
-  // reference's fixed 9–2 window, since real weeks vary.
-  const activityRange = useMemo(() => {
-    const weekBlocks = weekDays.flatMap((d) => blocksOnDay(state, d));
-    if (weekBlocks.length === 0) return { start: 8, end: 18 };
-    let min = 24;
-    let max = 0;
-    for (const b of weekBlocks) {
-      const s = new Date(b.scheduled_start);
-      const e = new Date(b.scheduled_end);
-      const sh = s.getHours() + s.getMinutes() / 60;
-      const eh = e.getHours() + e.getMinutes() / 60;
-      min = Math.min(min, sh);
-      max = Math.max(max, eh);
-    }
-    return { start: Math.max(0, Math.floor(min - 1)), end: Math.min(24, Math.ceil(max + 1)) };
-  }, [state, weekStart]);
-  const activityLabelCount = 6;
-  const activityLabels = Array.from({ length: activityLabelCount }, (_, i) => {
-    const h = activityRange.start + (i * (activityRange.end - activityRange.start)) / (activityLabelCount - 1);
-    const hour = Math.floor(h) % 24;
+  // Fixed full-day axis: always 12am–11:59pm, with the grid overflowing to a
+  // horizontal (invisible) scroll if it doesn't fit — rather than a range that
+  // shifts with each week's block times.
+  const activityRange = { start: 0, end: 24 };
+  // Labels every 3 hours: 12am, 3am, … 9pm, 12am (9 marks).
+  const activityLabels = Array.from({ length: 9 }, (_, i) => {
+    const hour = (i * 3) % 24;
     const displayHour = hour % 12 === 0 ? 12 : hour % 12;
-    return `${displayHour}:00`;
+    const suffix = hour < 12 ? 'am' : 'pm';
+    return `${displayHour}${suffix}`;
   });
   function activityPct(hourDecimal: number) {
     const span = activityRange.end - activityRange.start || 1;
@@ -576,7 +562,7 @@ export default function Dashboard() {
           </div>
 
           <div>
-            <div className={styles.railLabelOnPattern}>Today's adventure</div>
+            <div className={styles.railLabel}>Today's adventure</div>
             {adventure ? (
               (() => {
                 const ctx = contextById(adventure.context_id);
@@ -637,7 +623,7 @@ export default function Dashboard() {
           </div>
 
           <div>
-            <div className={styles.railLabelOnPattern}>Time on goal, this wk</div>
+            <div className={styles.railLabel}>Time on goal, this wk</div>
             <div className={styles.goalHoursCard}>
               {contexts.map((ctx) => {
                 const hrs = hoursByContext[ctx.id] || 0;

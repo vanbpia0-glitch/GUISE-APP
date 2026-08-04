@@ -256,12 +256,20 @@
 .activityWrap {
   position: relative;
   padding-left: 38px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.activityWrap::-webkit-scrollbar {
+  display: none;
 }
 
 .activityLabelsRow {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  grid-template-columns: repeat(9, 1fr);
   margin-bottom: 8px;
+  min-width: 820px;
 }
 
 .activityLabelsRow span {
@@ -271,13 +279,14 @@
 
 .activityGrid {
   position: relative;
+  min-width: 820px;
 }
 
 .activityGridLines {
   position: absolute;
   inset: 0;
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  grid-template-columns: repeat(9, 1fr);
   pointer-events: none;
 }
 
