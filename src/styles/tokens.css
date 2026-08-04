@@ -1,4 +1,92 @@
 :root {
+  /* ============================================================
+     Guise Design System (imported from claude.ai/design project
+     6de89e21-600b-4b4c-a203-a4e1e4ee4b4b) — full 10-step ramps +
+     semantic aliases. Additive: legacy tokens below are unchanged.
+     ============================================================ */
+  --ink-100: #372315; --ink-90: #372315; --ink-80: #4f3422; --ink-70: #704a33; --ink-60: #926247;
+  --ink-50: #ac836c; --ink-40: #c0a091; --ink-30: #d6c2b8; --ink-20: #e8ddd9; --ink-10: #f7f4f2;
+  --slate-100: #161513; --slate-90: #292723; --slate-80: #3f3c36; --slate-70: #5a554e; --slate-60: #736b66;
+  --slate-50: #928d86; --slate-40: #aca9a5; --slate-30: #c9c7c5; --slate-20: #e1e1e0; --slate-10: #f5f5f5;
+  --green-100: #191e10; --green-90: #29321a; --green-80: #3d4a26; --green-70: #5a6b38; --green-60: #7d944d;
+  --green-50: #9bb068; --green-40: #b4c48d; --green-30: #cfd9b5; --green-20: #e5ead7; --green-10: #f2f5eb;
+  --orange-100: #2e1200; --orange-90: #432500; --orange-80: #663600; --orange-70: #894700; --orange-60: #aa5500;
+  --orange-50: #c96100; --orange-40: #ed7e1c; --orange-30: #f6a360; --orange-20: #ffc89e; --orange-10: #ffeee2;
+  --yellow-100: #2e2500; --yellow-90: #4d3c00; --yellow-80: #705600; --yellow-70: #a37a00; --yellow-60: #e0a500;
+  --yellow-50: #ffbd1a; --yellow-40: #ffce5c; --yellow-30: #ffdb8f; --yellow-20: #ffebc2; --yellow-10: #fff4e0;
+  --purple-100: #161324; --purple-90: #292350; --purple-80: #3c357c; --purple-70: #5349a5; --purple-60: #6c5fc8;
+  --purple-50: #8978e3; --purple-40: #a694f5; --purple-30: #c2b1ff; --purple-20: #ddd1ff; --purple-10: #f6f1ff;
+
+  /* Semantic aliases — --surface-page overridden to white per product decision
+     (kit default is --ink-10 cream; Guise keeps a white canvas, cards use --surface-card). */
+  --surface-page: #ffffff;
+  --surface-card: #ffffff;
+  --surface-sidebar: var(--ink-90);
+  --surface-sunken: var(--ink-20);
+  --surface-inverse: var(--ink-90);
+
+  --text-primary: var(--ink-90);
+  --text-secondary: var(--slate-60);
+  --text-tertiary: var(--slate-40);
+  --text-on-accent: #ffffff;
+  --text-on-inverse: var(--ink-10);
+  --text-link: var(--green-70);
+
+  --border-subtle: var(--ink-20);
+  --border-default: var(--slate-30);
+  --border-strong: var(--ink-90);
+
+  --accent-primary: var(--green-60);
+  --accent-primary-hover: var(--green-70);
+  --accent-primary-active: var(--green-80);
+  --accent-primary-subtle: var(--green-20);
+  --accent-secondary: var(--orange-40);
+  --accent-secondary-hover: var(--orange-50);
+  --accent-secondary-subtle: var(--orange-20);
+  --accent-warning: var(--yellow-50);
+  --accent-warning-subtle: var(--yellow-20);
+  --accent-info: var(--purple-40);
+  --accent-info-subtle: var(--purple-20);
+  --success: var(--green-60);
+  --success-subtle: var(--green-20);
+  --danger: var(--orange-60);
+  --danger-subtle: var(--orange-20);
+
+  /* Type scale */
+  --display-lg: 64px; --display-md: 52px; --display-sm: 44px;
+  --heading-2xl: 36px; --heading-xl: 32px; --heading-lg: 28px; --heading-md: 24px; --heading-sm: 20px; --heading-xs: 18px;
+  --text-2xl: 22px; --text-xl: 20px; --text-lg: 18px; --text-md: 16px; --text-sm: 14px; --text-xs: 13px; --text-2xs: 12px;
+  --label-2xl: 18px; --label-xl: 16px; --label-lg: 14px; --label-md: 13px; --label-sm: 12px;
+  --weight-regular: 400; --weight-medium: 500; --weight-semibold: 600; --weight-bold: 700; --weight-extrabold: 800;
+  --leading-tight: 1.1; --leading-snug: 1.3; --leading-normal: 1.5; --leading-relaxed: 1.65;
+
+  /* Spacing / radius */
+  --space-1: 2px; --space-2: 4px; --space-3: 6px; --space-4: 8px; --space-6: 12px; --space-8: 16px;
+  --space-12: 24px; --space-16: 32px; --space-24: 48px; --space-32: 64px; --space-48: 96px; --space-64: 128px;
+  --radius-sm: 8px; --radius-md: 14px; --radius-lg: 20px; --radius-xl: 28px; --radius-pill: 999px;
+  --container-mobile: 375px;
+  --grid-margin: 16px;
+
+  /* Effects */
+  --k-shadow-xs: 0 1px 2px rgba(55, 35, 21, 0.06);
+  --k-shadow-sm: 0 2px 6px rgba(55, 35, 21, 0.07);
+  --k-shadow-md: 0 6px 16px rgba(55, 35, 21, 0.09);
+  --k-shadow-lg: 0 12px 28px rgba(55, 35, 21, 0.12);
+  --k-shadow-xl: 0 20px 44px rgba(55, 35, 21, 0.16);
+  --k-shadow-2xl: 0 32px 64px rgba(55, 35, 21, 0.2);
+  --blur-sm: 8px; --blur-md: 16px; --blur-lg: 24px;
+  --focus-ring-default: 0 0 0 3px rgba(55, 35, 21, 0.18);
+  --focus-ring-primary: 0 0 0 3px var(--green-20);
+  --focus-ring-secondary: 0 0 0 3px var(--orange-20);
+  --focus-ring-warning: 0 0 0 3px var(--yellow-20);
+  --focus-ring-info: 0 0 0 3px var(--purple-20);
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --duration-fast: 120ms; --duration-standard: 200ms; --duration-slow: 320ms;
+
+  /* ============================================================
+     Legacy Guise tokens (pre-existing app) — kept as-is, values
+     already match the kit's orange/green/yellow/purple families.
+     ============================================================ */
   /* Neutrals */
   --ink: #292723;
   --ink-soft: #4d4a44;
@@ -46,19 +134,19 @@
   --night-faint: #ddd1ff;
   --night-faint-2: #eae4ff;
 
-  /* Radii */
-  --r-sm: 8px;
-  --r-md: 12px;
-  --r-lg: 16px;
-  --r-xl: 20px;
-  --r-2xl: 22px;
-  --r-3xl: 26px;
-  --r-pill: 20px;
+  /* Radii — aligned to the kit's radius scale */
+  --r-sm: var(--radius-sm);
+  --r-md: var(--radius-md);
+  --r-lg: var(--radius-lg);
+  --r-xl: var(--radius-lg);
+  --r-2xl: var(--radius-lg);
+  --r-3xl: var(--radius-xl);
+  --r-pill: var(--radius-pill);
 
-  /* Shadows */
-  --shadow-card: 0 4px 20px rgba(41, 39, 35, 0.06);
-  --shadow-card-lg: 0 6px 22px rgba(41, 39, 35, 0.08);
-  --shadow-cta: 0 6px 16px rgba(41, 39, 35, 0.25);
+  /* Shadows — aligned to the kit's shadow scale */
+  --shadow-card: var(--k-shadow-sm);
+  --shadow-card-lg: var(--k-shadow-md);
+  --shadow-cta: 0 6px 16px rgba(55, 35, 21, 0.25);
   --shadow-pop: 0 10px 24px rgba(237, 126, 28, 0.35);
 
   --font-sans: 'Urbanist', -apple-system, BlinkMacSystemFont, sans-serif;

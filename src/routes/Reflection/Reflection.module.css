@@ -47,7 +47,7 @@
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.14);
-  border-radius: 28px;
+  border-radius: var(--r-3xl);
   padding: 26px 24px 22px;
 }
 
@@ -115,7 +115,7 @@
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.14);
-  border-radius: 24px;
+  border-radius: var(--r-lg);
   padding: 18px 20px;
 }
 
@@ -128,7 +128,7 @@
 .quoteIconBox {
   width: 32px;
   height: 32px;
-  border-radius: 12px;
+  border-radius: var(--r-md);
   background: rgba(255, 255, 255, 0.14);
   display: flex;
   align-items: center;
@@ -154,7 +154,7 @@
 
 .whiteCard {
   background: rgba(255, 255, 255, 0.96);
-  border-radius: 24px;
+  border-radius: var(--r-lg);
   padding: 20px;
 }
 
@@ -180,7 +180,7 @@
 .moodIconBox {
   width: 46px;
   height: 46px;
-  border-radius: 16px;
+  border-radius: var(--r-lg);
   background: var(--surface-tint);
   display: flex;
   align-items: center;
@@ -220,7 +220,7 @@
 .textarea {
   width: 100%;
   border: none;
-  border-radius: 12px;
+  border-radius: var(--r-md);
   padding: 11px 12px;
   font-size: 12.5px;
   font-family: inherit;
@@ -244,7 +244,7 @@
   font-size: 12px;
   font-weight: 600;
   padding: 6px 13px;
-  border-radius: 20px;
+  border-radius: var(--r-pill);
   border: none;
   cursor: pointer;
 }
@@ -255,7 +255,7 @@
   border: none;
   text-align: center;
   padding: 15px;
-  border-radius: 24px;
+  border-radius: var(--r-pill);
   font-size: 13.5px;
   font-weight: 700;
   cursor: pointer;

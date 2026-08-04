@@ -87,7 +87,7 @@
   align-items: center;
   gap: 4px;
   background: rgba(255, 255, 255, 0.5);
-  border-radius: 20px;
+  border-radius: var(--r-pill);
   padding: 6px 10px;
 }
 
@@ -106,7 +106,7 @@
 }
 
 .shareBtn {
-  border-radius: 20px;
+  border-radius: var(--r-pill);
   padding: 7px 14px;
   display: flex;
   align-items: center;
@@ -125,7 +125,7 @@
 }
 
 .card {
-  border-radius: 20px;
+  border-radius: var(--r-lg);
   padding: 16px;
 }
 
@@ -326,7 +326,7 @@
 
 .todTile {
   flex: 1;
-  border-radius: 16px;
+  border-radius: var(--r-lg);
   padding: 20px 12px;
   text-align: center;
 }
@@ -380,7 +380,7 @@
 .donutIconBox {
   width: 30px;
   height: 30px;
-  border-radius: 10px;
+  border-radius: var(--r-sm);
   display: flex;
   align-items: center;
   justify-content: center;

@@ -1,7 +1,7 @@
 .overlay {
   position: fixed;
   inset: 0;
-  background: rgba(41, 39, 35, 0.45);
+  background: rgba(55, 35, 21, 0.45);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -17,7 +17,7 @@
   max-width: 420px;
   max-height: 85vh;
   overflow-y: auto;
-  box-shadow: 0 20px 60px rgba(41, 39, 35, 0.3);
+  box-shadow: var(--k-shadow-2xl);
 }
 
 .header {

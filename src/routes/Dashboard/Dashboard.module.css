@@ -57,7 +57,7 @@
   padding: 8px 10px 8px 32px;
   font-size: 12px;
   border: 1px solid var(--border);
-  border-radius: var(--r-sm);
+  border-radius: var(--r-pill);
 }
 
 .iconBtn {
@@ -119,7 +119,7 @@
   color: var(--ink);
   background: none;
   border: none;
-  border-radius: 10px;
+  border-radius: var(--r-md);
   text-align: left;
   width: 100%;
   font-family: inherit;
@@ -211,14 +211,14 @@
 
 .barTrack {
   height: 5px;
-  border-radius: 20px;
+  border-radius: var(--r-pill);
   overflow: hidden;
   background: rgba(0, 0, 0, 0.08);
 }
 
 .barFill {
   height: 100%;
-  border-radius: 20px;
+  border-radius: var(--r-pill);
 }
 
 .contextHours {
@@ -339,7 +339,7 @@
 .activityPill {
   position: absolute;
   height: 20px;
-  border-radius: 20px;
+  border-radius: var(--r-pill);
   display: flex;
   align-items: center;
   padding-left: 10px;
@@ -415,7 +415,7 @@
 .rowIconBox {
   width: 30px;
   height: 30px;
-  border-radius: 9px;
+  border-radius: var(--r-sm);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -652,7 +652,7 @@
   font-size: 9px;
   color: white;
   padding: 2px 8px;
-  border-radius: 20px;
+  border-radius: var(--r-pill);
   font-weight: 700;
 }
 
@@ -764,7 +764,7 @@
 .goalHoursTrack {
   height: 4px;
   background: rgba(255, 255, 255, 0.6);
-  border-radius: 20px;
+  border-radius: var(--r-pill);
   overflow: hidden;
   margin-bottom: 7px;
 }

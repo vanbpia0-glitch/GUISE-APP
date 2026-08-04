@@ -43,3 +43,9 @@ export const COLOR_RAMPS: Record<ColorKey, ColorRamp> = {
 export function colorsFor(key: ColorKey): ColorRamp {
   return COLOR_RAMPS[key];
 }
+
+/** Full 10-step design-kit ramp (100=darkest, 10=lightest) for a context's color family. */
+export function shadesFor(key: ColorKey): string[] {
+  const steps = [100, 90, 80, 70, 60, 50, 40, 30, 20, 10];
+  return steps.map((s) => `var(--${key}-${s})`);
+}
