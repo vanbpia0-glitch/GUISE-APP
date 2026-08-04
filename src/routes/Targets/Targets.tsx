@@ -43,6 +43,7 @@ export default function Targets() {
   const { state, dispatch } = useStore();
   const now = new Date();
   const [contextFilter, setContextFilter] = useState<string | null>(null);
+  const [timeframeFilter, setTimeframeFilter] = useState<'year' | 'quarter'>('year');
   const [showAdd, setShowAdd] = useState(false);
   const [showAchieved, setShowAchieved] = useState(false);
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -53,7 +54,12 @@ export default function Targets() {
   const allTargets = Object.values(state.targets);
   const active = allTargets.filter((t) => t.status === 'active');
   const achieved = allTargets.filter((t) => t.status === 'achieved');
-  const visible = contextFilter ? active.filter((t) => t.context_id === contextFilter) : active;
+  const visible = active
+    .filter((t) => t.timeframe === timeframeFilter)
+    .filter((t) => (contextFilter ? t.context_id === contextFilter : true));
+
+  // The target shown in the side-rail detail view (tapped one, or the first visible).
+  const detailTarget = visible.find((t) => t.id === expandedId) || visible[0];
 
   const paceCounts = active.reduce(
     (acc, t) => {
@@ -82,9 +88,25 @@ export default function Targets() {
       <div className={styles.headerRow}>
         <div className={styles.titleRow}>
           <div className={styles.title}>Targets</div>
-          <button className={styles.addBtn} onClick={() => setShowAdd(true)}>
-            <IconPlus size={13} /> Add target
-          </button>
+          <div className={styles.headerActions}>
+            <div className={styles.timeframeToggle}>
+              <button
+                className={`${styles.timeframeOption} ${timeframeFilter === 'year' ? styles.timeframeOptionActive : ''}`}
+                onClick={() => setTimeframeFilter('year')}
+              >
+                This year
+              </button>
+              <button
+                className={`${styles.timeframeOption} ${timeframeFilter === 'quarter' ? styles.timeframeOptionActive : ''}`}
+                onClick={() => setTimeframeFilter('quarter')}
+              >
+                This quarter
+              </button>
+            </div>
+            <button className={styles.addBtn} onClick={() => setShowAdd(true)}>
+              <IconPlus size={13} /> Add target
+            </button>
+          </div>
         </div>
         <div className={styles.subtitle}>
           Simple numbers ticking toward other numbers — no whys, no blockers, just count what counts.
@@ -123,14 +145,13 @@ export default function Targets() {
             const pace = targetPaceStatus(t, now);
             const { end } = targetDateRange(t);
             const wks = weeksLeft(end, now);
-            const expanded = expandedId === t.id;
-            const entries = expanded ? targetLogEntriesFor(state, t.id) : [];
+            const selected = detailTarget?.id === t.id;
             return (
               <div
                 key={t.id}
-                className={styles.card}
+                className={`${styles.card} ${selected ? styles.cardSelected : ''}`}
                 style={{ background: colors.tint }}
-                onClick={() => setExpandedId(expanded ? null : t.id)}
+                onClick={() => setExpandedId(t.id)}
               >
                 <div className={styles.cardTop}>
                   <div className={styles.cardIconRow}>
@@ -219,25 +240,6 @@ export default function Targets() {
                     <IconChevronRight size={16} color={colors.mid} className={styles.cardChevron} />
                   </div>
                 </div>
-
-                {expanded && (
-                  <div className={styles.detailPanel}>
-                    <div className={styles.detailLabel} style={{ color: colors.mid }}>
-                      Log history
-                    </div>
-                    {entries.length === 0 && <div style={{ fontSize: 12, color: colors.mid }}>No log entries yet.</div>}
-                    {entries.map((e) => (
-                      <div className={styles.logRow} key={e.id} style={{ color: colors.deep }}>
-                        <span>
-                          +{e.amount} {t.metric_unit} {e.source === 'system_completion' ? '· auto' : ''}
-                        </span>
-                        <span style={{ color: colors.mid, fontSize: 11.5 }}>
-                          {new Date(e.logged_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                )}
               </div>
             );
           })}
@@ -293,6 +295,81 @@ export default function Targets() {
               {paceCounts.behind} behind · {paceCounts.ahead} ahead
             </div>
           </div>
+
+          {detailTarget && (() => {
+            const t = detailTarget;
+            const ctx = t.context_id ? state.contexts[t.context_id] : undefined;
+            const colors = colorsFor((ctx?.color_key || 'purple') as ColorKey);
+            const pct = targetProgressPct(t);
+            const { end } = targetDateRange(t);
+            const wks = weeksLeft(end, now);
+            const entries = targetLogEntriesFor(state, t.id);
+            return (
+              <div className={styles.detailCard} style={{ background: colors.tint }}>
+                <div className={styles.detailTop}>
+                  <div className={styles.detailIconBox}>{targetIcon(t, ctx?.icon, colors.mid)}</div>
+                  <div>
+                    <div className={styles.detailTitle} style={{ color: colors.deep }}>
+                      {t.title}
+                    </div>
+                    <div className={styles.detailMeta} style={{ color: colors.mid }}>
+                      {ctx ? `${ctx.name} · ` : ''}
+                      {t.timeframe_label} · {wks} wks left
+                    </div>
+                  </div>
+                </div>
+
+                <div className={styles.detailProgressTrack}>
+                  <div className={styles.detailProgressFill} style={{ width: `${Math.min(100, pct)}%`, background: colors.base }} />
+                  {[25, 50, 75].map((m) => (
+                    <div key={m} className={styles.tick} style={{ left: `${m}%` }} />
+                  ))}
+                </div>
+
+                <div className={styles.detailCount} style={{ color: colors.deep }}>
+                  {t.current_amount}
+                  <span style={{ fontSize: 12, color: colors.mid, fontWeight: 600 }}> of {t.goal_amount} {t.metric_unit}</span>
+                </div>
+
+                {t.linked_system_id ? (
+                  <div className={styles.autoTag} style={{ color: colors.mid }}>Synced from system</div>
+                ) : (
+                  <div className={styles.detailActions}>
+                    {customOpenId === t.id ? (
+                      <>
+                        <input
+                          type="number"
+                          className={styles.customInput}
+                          value={customValue}
+                          autoFocus
+                          onChange={(e) => setCustomValue(e.target.value)}
+                          onKeyDown={(e) => e.key === 'Enter' && submitCustom(t)}
+                        />
+                        <button className={styles.customAddBtn} onClick={() => submitCustom(t)}>Add</button>
+                      </>
+                    ) : (
+                      <>
+                        <button className={styles.detailPillBtn} style={{ color: colors.deep }} onClick={() => logAmount(t, 1)}>+1</button>
+                        <button className={styles.detailPillBtn} style={{ color: colors.deep }} onClick={() => logAmount(t, 3)}>+3</button>
+                        <button className={styles.detailCustomBtn} onClick={() => setCustomOpenId(t.id)}>Custom amount</button>
+                      </>
+                    )}
+                  </div>
+                )}
+
+                <div className={styles.detailLogLabel} style={{ color: colors.mid }}>Log history</div>
+                {entries.length === 0 && <div style={{ fontSize: 12, color: colors.mid }}>No log entries yet.</div>}
+                {entries.map((e) => (
+                  <div className={styles.detailLogRow} key={e.id} style={{ color: colors.deep }}>
+                    <span>+{e.amount} {t.metric_unit}{e.source === 'system_completion' ? ' · auto' : ''}</span>
+                    <span style={{ color: colors.mid, fontSize: 11.5 }}>
+                      {new Date(e.logged_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            );
+          })()}
 
           {active.length > 0 && (
             <button className={styles.achievedLink} onClick={() => setShowAchieved((v) => !v)}>

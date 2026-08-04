@@ -11,7 +11,7 @@
 
 .body {
   display: grid;
-  grid-template-columns: 1fr 260px;
+  grid-template-columns: 1fr 320px;
   gap: 24px;
   align-items: start;
 }
@@ -45,6 +45,36 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 8px;
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.timeframeToggle {
+  display: flex;
+  background: var(--surface-tint);
+  border-radius: var(--r-pill);
+  padding: 3px;
+}
+
+.timeframeOption {
+  border: none;
+  background: none;
+  border-radius: var(--r-pill);
+  padding: 7px 15px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--muted-2);
+  cursor: pointer;
+}
+
+.timeframeOptionActive {
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: var(--k-shadow-xs);
 }
 
 .title {
@@ -132,6 +162,110 @@
   gap: 5px;
 }
 
+/* Side-rail detail view (opens on tap) */
+.detailCard {
+  border-radius: var(--r-lg);
+  padding: 20px;
+  box-shadow: var(--shadow-card-lg);
+}
+
+.detailTop {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.detailIconBox {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--r-md);
+  background: rgba(255, 255, 255, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.detailTitle {
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.detailMeta {
+  font-size: 11px;
+  margin-top: 3px;
+}
+
+.detailProgressTrack {
+  position: relative;
+  height: 14px;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: var(--r-pill);
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+.detailProgressFill {
+  height: 100%;
+  border-radius: var(--r-pill);
+}
+
+.detailCount {
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 14px;
+}
+
+.detailActions {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.detailPillBtn {
+  flex: 1;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 10px 0;
+  border-radius: var(--r-pill);
+  background: rgba(255, 255, 255, 0.65);
+  border: none;
+  cursor: pointer;
+}
+
+.detailCustomBtn {
+  flex: 2;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 10px 0;
+  border-radius: var(--r-pill);
+  background: var(--ink);
+  color: white;
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.detailLogLabel {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 10px;
+}
+
+.detailLogRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12.5px;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: var(--r-md);
+  padding: 10px 14px;
+  margin-bottom: 6px;
+}
+
 .dot {
   width: 6px;
   height: 6px;
@@ -144,6 +278,12 @@
   padding: 22px;
   box-shadow: var(--shadow-card-lg);
   cursor: pointer;
+  outline: 2px solid transparent;
+  transition: outline-color var(--duration-fast) var(--ease-standard);
+}
+
+.cardSelected {
+  outline-color: rgba(41, 39, 35, 0.28);
 }
 
 .cardTop {
