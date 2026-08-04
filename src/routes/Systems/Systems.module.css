@@ -19,6 +19,16 @@
   font-weight: 700;
   color: var(--ink);
   margin-bottom: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.viewAll {
+  font-size: 10.5px;
+  color: var(--sc-mid);
+  font-weight: 700;
+  cursor: pointer;
 }
 
 .ruleCard {
@@ -96,6 +106,29 @@
   flex: 1;
   overflow-y: auto;
   background: var(--van-tint);
+  position: relative;
+}
+
+.middle::-webkit-scrollbar {
+  display: none;
+}
+.middle {
+  scrollbar-width: none;
+}
+
+.middleBg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 1700px;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.middleInner {
+  position: relative;
+  z-index: 1;
   padding: 26px 24px 30px;
 }
 
@@ -109,7 +142,22 @@
 .middleTitle {
   font-size: 13px;
   font-weight: 700;
-  color: var(--van-deep);
+  color: var(--sc-deep);
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.4);
+}
+
+.middleAdd {
+  width: 34px;
+  height: 34px;
+  border-radius: var(--r-md);
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 .sysCard {
@@ -243,6 +291,12 @@
   margin-bottom: 6px;
 }
 
+.ringSvg {
+  max-width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
 .domainLegend {
   display: flex;
   flex-wrap: wrap;
@@ -275,13 +329,153 @@
   color: var(--muted);
 }
 
-.rhythmCard {
+.rhythmCard,
+.byDomainCard {
   backdrop-filter: blur(20px);
   background: rgba(245, 243, 240, 0.6);
   border: 1px solid rgba(255, 255, 255, 0.7);
   border-radius: var(--r-lg);
   padding: 18px;
   box-shadow: var(--shadow-card);
+}
+
+.byDomainTitle {
+  font-size: 11px;
+  color: var(--muted);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  margin-bottom: 12px;
+}
+
+.byDomainRow {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.byDomainLegend {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.byDomainLegendItem {
+  font-size: 10.5px;
+  color: var(--ink-soft);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* Left-rail mini calendar */
+.calCard {
+  background: var(--surface-tint);
+  border-radius: var(--r-lg);
+  padding: 16px;
+  margin-top: 4px;
+}
+
+.calHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.calMonth {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.calNav {
+  display: flex;
+  gap: 4px;
+}
+
+.calNavBtn {
+  width: 20px;
+  height: 20px;
+  border-radius: var(--r-sm);
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--k-shadow-xs);
+}
+
+.calDow {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px 0;
+  margin-bottom: 6px;
+}
+
+.calDowCell {
+  font-size: 8.5px;
+  color: var(--muted-2);
+  text-align: center;
+  font-weight: 700;
+}
+
+.calWeek {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 10px 0;
+}
+
+.calDayCell {
+  text-align: center;
+}
+
+.calDayNum {
+  font-size: 11px;
+  color: var(--ink);
+}
+
+.calToday {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--sc-base);
+  color: white;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  box-shadow: 0 3px 8px rgba(237, 126, 28, 0.4);
+}
+
+.calDotRow {
+  display: flex;
+  justify-content: center;
+  gap: 2px;
+  margin-top: 3px;
+}
+
+.calDot {
+  width: 3.5px;
+  height: 3.5px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.calLegend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+
+.calLegendItem {
+  font-size: 8.5px;
+  display: flex;
+  align-items: center;
+  gap: 3px;
 }
 
 .rhythmTitle {
