@@ -21,7 +21,9 @@ import {
   ContextIcon,
   IconArrowRight,
   IconBell,
+  IconCamera,
   IconClock,
+  IconEdit,
   IconPlayerPlay,
   IconPlayerStopFilled,
   IconPlus,
@@ -70,6 +72,39 @@ export default function Dashboard() {
 
   const weekStart = startOfWeek(now);
   const weekDays = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
+
+  // Time-axis range for the "Upcoming activity" grid, derived from this
+  // week's actual Block times (padded an hour each side) rather than the
+  // reference's fixed 9–2 window, since real weeks vary.
+  const activityRange = useMemo(() => {
+    const weekBlocks = weekDays.flatMap((d) => blocksOnDay(state, d));
+    if (weekBlocks.length === 0) return { start: 8, end: 18 };
+    let min = 24;
+    let max = 0;
+    for (const b of weekBlocks) {
+      const s = new Date(b.scheduled_start);
+      const e = new Date(b.scheduled_end);
+      const sh = s.getHours() + s.getMinutes() / 60;
+      const eh = e.getHours() + e.getMinutes() / 60;
+      min = Math.min(min, sh);
+      max = Math.max(max, eh);
+    }
+    return { start: Math.max(0, Math.floor(min - 1)), end: Math.min(24, Math.ceil(max + 1)) };
+  }, [state, weekStart]);
+  const activityLabelCount = 6;
+  const activityLabels = Array.from({ length: activityLabelCount }, (_, i) => {
+    const h = activityRange.start + (i * (activityRange.end - activityRange.start)) / (activityLabelCount - 1);
+    const hour = Math.floor(h) % 24;
+    const displayHour = hour % 12 === 0 ? 12 : hour % 12;
+    return `${displayHour}:00`;
+  });
+  function activityPct(hourDecimal: number) {
+    const span = activityRange.end - activityRange.start || 1;
+    return Math.min(100, Math.max(0, ((hourDecimal - activityRange.start) / span) * 100));
+  }
+  const nowHourDecimal = now.getHours() + now.getMinutes() / 60;
+  const nowPct = activityPct(nowHourDecimal);
+  const nowInRange = nowHourDecimal >= activityRange.start && nowHourDecimal <= activityRange.end;
 
   const runningSession = state.activeTimerBlockId
     ? Object.values(state.workSessions).find((s) => s.block_id === state.activeTimerBlockId && !s.ended_at)
@@ -222,7 +257,7 @@ export default function Dashboard() {
                       {pct}%
                     </span>
                   </div>
-                  <div className={styles.barTrack}>
+                  <div className={styles.barTrack} style={{ background: colors.track }}>
                     <div className={styles.barFill} style={{ width: `${pct}%`, background: colors.base }} />
                   </div>
                 </div>
@@ -245,35 +280,66 @@ export default function Dashboard() {
         </div>
 
         <div className={styles.panel} ref={weekRef}>
-          <div className={styles.panelTitle}>This week</div>
-          {weekDays.map((day) => {
-            const blocks = blocksOnDay(state, day);
-            const today_ = isSameDay(day, now);
-            return (
-              <div className={styles.weekRow} key={day.toISOString()}>
-                <span className={`${styles.weekDayLabel} ${today_ ? styles.weekDayLabelToday : ''}`}>
-                  {weekdayLabel(day)}
-                </span>
-                <div className={styles.weekChips}>
-                  {blocks.length === 0 && <span className={styles.weekEmpty}>—</span>}
-                  {blocks.map((b) => {
-                    const ctx = contextById(b.context_id);
-                    const colors = ctx ? colorsFor(ctx.color_key) : undefined;
-                    return (
-                      <span
-                        key={b.id}
-                        className={`${styles.chip} ${b.completed_at ? styles.chipDone : ''}`}
-                        style={{ background: colors?.tint, color: colors?.deep }}
-                      >
-                        <span className={styles.chipDot} style={{ background: colors?.mid }} />
-                        {b.title} · {formatTimeShort(b.scheduled_start)}
-                      </span>
-                    );
-                  })}
-                </div>
+          <div className={styles.panelTitle}>Upcoming activity</div>
+          <div className={styles.activityWrap}>
+            <div className={styles.activityLabelsRow}>
+              {activityLabels.map((label, i) => (
+                <span key={i}>{label}</span>
+              ))}
+            </div>
+            <div className={styles.activityGrid}>
+              <div className={styles.activityGridLines}>
+                {activityLabels.map((_, i) => (
+                  <div className={styles.activityGridLine} key={i} />
+                ))}
               </div>
-            );
-          })}
+              {nowInRange && (
+                <div className={styles.activityNowLine} style={{ left: `${nowPct}%` }}>
+                  <div className={styles.activityNowDot} />
+                </div>
+              )}
+              <div className={styles.activityRows}>
+                {weekDays.map((day) => {
+                  const blocks = blocksOnDay(state, day);
+                  const today_ = isSameDay(day, now);
+                  return (
+                    <div className={styles.activityRow} key={day.toISOString()}>
+                      <span className={`${styles.activityRowLabel} ${today_ ? styles.activityRowLabelToday : ''}`}>
+                        {weekdayLabel(day)}
+                      </span>
+                      {blocks.map((b) => {
+                        const ctx = contextById(b.context_id);
+                        const colors = ctx ? colorsFor(ctx.color_key) : undefined;
+                        const s = new Date(b.scheduled_start);
+                        const e = new Date(b.scheduled_end);
+                        const startH = s.getHours() + s.getMinutes() / 60;
+                        const endH = e.getHours() + e.getMinutes() / 60;
+                        const left = activityPct(startH);
+                        const width = Math.max(10, activityPct(endH) - left);
+                        return (
+                          <div
+                            key={b.id}
+                            className={styles.activityPill}
+                            style={{
+                              left: `${left}%`,
+                              width: `${Math.min(100 - left, width)}%`,
+                              background: colors?.tint,
+                              opacity: b.completed_at ? 0.55 : 1,
+                            }}
+                          >
+                            <span className={styles.activityPillDot} style={{ background: colors?.mid }} />
+                            <span className={styles.activityPillLabel} style={{ color: colors?.deep }}>
+                              {b.title}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
         </div>
 
         <div className={styles.row2}>
@@ -282,17 +348,39 @@ export default function Dashboard() {
             <div className={styles.momentumRingWrap}>
               <svg width="120" height="120" viewBox="0 0 130 130">
                 <circle cx="65" cy="65" r="54" fill="none" stroke="var(--surface-tint)" strokeWidth="12" />
-                <circle
-                  cx="65"
-                  cy="65"
-                  r="54"
-                  fill="none"
-                  stroke="var(--sc-base)"
-                  strokeWidth="12"
-                  strokeDasharray={`${(momentum.momentum / 100) * C} ${C}`}
-                  strokeLinecap="round"
-                  transform="rotate(-90 65 65)"
-                />
+                {(() => {
+                  const weightSum = momentum.blocksPct + momentum.goalsPct;
+                  const total = (momentum.momentum / 100) * C;
+                  const seg1 = weightSum === 0 ? 0 : total * (momentum.blocksPct / weightSum);
+                  const seg2 = weightSum === 0 ? 0 : total * (momentum.goalsPct / weightSum);
+                  return (
+                    <>
+                      <circle
+                        cx="65"
+                        cy="65"
+                        r="54"
+                        fill="none"
+                        stroke="var(--sc-base)"
+                        strokeWidth="12"
+                        strokeDasharray={`${seg1} ${C}`}
+                        strokeLinecap="round"
+                        transform="rotate(-90 65 65)"
+                      />
+                      <circle
+                        cx="65"
+                        cy="65"
+                        r="54"
+                        fill="none"
+                        stroke="var(--grounds-base)"
+                        strokeWidth="12"
+                        strokeDasharray={`${seg2} ${C}`}
+                        strokeDashoffset={-seg1}
+                        strokeLinecap="round"
+                        transform="rotate(-90 65 65)"
+                      />
+                    </>
+                  );
+                })()}
                 <text x="65" y="62" textAnchor="middle" fontSize="22" fontWeight="700" fill="var(--ink)">
                   {momentum.momentum}%
                 </text>
@@ -350,8 +438,8 @@ export default function Dashboard() {
           <div className={styles.panel}>
             <div className={styles.panelTitle}>
               Systems
-              <Link to="/systems" className={styles.seeAll}>
-                Manage →
+              <Link to="/systems" className={styles.seeAllPlus}>
+                <IconPlus size={12} /> Add
               </Link>
             </div>
             <div className={`${styles.listGap} gscroll`} style={{ maxHeight: 200, overflowY: 'auto' }}>
@@ -386,21 +474,51 @@ export default function Dashboard() {
             <div className={styles.barsRow}>
               {weekDays.map((day) => {
                 const dayBlocks = blocksOnDay(state, day);
-                const mins = dayBlocks.reduce((sum, b) => sum + blockActualMinutes(state, b, now), 0);
+                const minutesByContext = contexts.map((ctx) => ({
+                  ctx,
+                  minutes: dayBlocks
+                    .filter((b) => b.context_id === ctx.id)
+                    .reduce((sum, b) => sum + blockActualMinutes(state, b, now), 0),
+                }));
+                const mins = minutesByContext.reduce((s, c) => s + c.minutes, 0);
                 const maxMins = Math.max(
                   60,
                   ...weekDays.map((d) =>
                     blocksOnDay(state, d).reduce((s, b) => s + blockActualMinutes(state, b, now), 0)
                   )
                 );
-                const heightPct = Math.max(4, (mins / maxMins) * 100);
                 const today_ = isSameDay(day, now);
                 return (
                   <div className={styles.barCol} key={day.toISOString()}>
-                    <div
-                      className={styles.barColBar}
-                      style={{ height: `${mins > 0 ? heightPct : 2}%`, opacity: mins > 0 ? 1 : 0.25 }}
-                    />
+                    <div className={styles.barColStack} style={{ height: `${mins > 0 ? Math.max(4, (mins / maxMins) * 100) : 2}%`, opacity: mins > 0 ? 1 : 0.25 }}>
+                      {(() => {
+                        const segs = minutesByContext.filter((c) => c.minutes > 0);
+                        if (segs.length === 0) {
+                          return <div className={styles.barColSeg} style={{ height: '100%', background: 'var(--faint)', borderRadius: '3px 3px 0 0' }} />;
+                        }
+                        return segs.map(({ ctx, minutes }, i) => {
+                          const radius =
+                            segs.length === 1
+                              ? '3px'
+                              : i === 0
+                                ? '3px 3px 0 0'
+                                : i === segs.length - 1
+                                  ? '0 0 3px 3px'
+                                  : '0';
+                          return (
+                            <div
+                              key={ctx.id}
+                              className={styles.barColSeg}
+                              style={{
+                                height: `${(minutes / mins) * 100}%`,
+                                background: colorsFor(ctx.color_key).base,
+                                borderRadius: radius,
+                              }}
+                            />
+                          );
+                        });
+                      })()}
+                    </div>
                     <span className={`${styles.barColLabel} ${today_ ? styles.barColLabelToday : ''}`}>
                       {weekdayLabel(day).slice(0, 3)}
                     </span>
@@ -408,20 +526,57 @@ export default function Dashboard() {
                 );
               })}
             </div>
+            <div className={styles.contextLegendRow}>
+              {contexts.map((ctx) => (
+                <span key={ctx.id} style={{ color: colorsFor(ctx.color_key).deep }}>
+                  ● {ctx.name}
+                </span>
+              ))}
+            </div>
           </div>
         </div>
       </div>
 
       <aside className={styles.rightRail}>
+        <svg
+          className={styles.rightRailBg}
+          viewBox="0 0 300 1040"
+          preserveAspectRatio="xMidYMid slice"
+          aria-hidden="true"
+        >
+          <rect width="300" height="1040" fill="#F1EFE8" />
+          <path
+            d="M0 40 Q40 0 90 30 T180 20 Q220 10 260 50 T300 60 L300 180 Q250 200 210 160 T140 150 Q90 170 50 130 T0 150 Z"
+            fill="#ED7E1C"
+          />
+          <path
+            d="M0 260 Q60 230 110 270 T220 250 Q260 260 300 240 L300 380 Q240 400 190 360 T100 370 Q50 390 0 360 Z"
+            fill="#ED7E1C"
+          />
+          <path
+            d="M0 480 Q50 450 100 490 T210 470 Q260 480 300 460 L300 600 Q240 620 180 580 T80 590 Q30 610 0 580 Z"
+            fill="#ED7E1C"
+          />
+          <path
+            d="M0 700 Q60 670 120 710 T230 690 Q270 700 300 680 L300 900 Q250 920 200 890 T100 900 L0 900 Z"
+            fill="#ED7E1C"
+          />
+        </svg>
         <div className={styles.railInner}>
           <div className={styles.profileCard}>
+            <button className={styles.cameraBtn} aria-label="Change photo" title="Change photo">
+              <IconCamera size={12} color="white" />
+            </button>
             <div className={styles.avatar}>G</div>
             <div className={styles.profileName}>{greeting.split(' ')[1] === 'morning' ? 'Welcome back' : 'Welcome back'}</div>
             <div className={styles.profileRole}>{contexts[0]?.role_description || 'Your day, at a glance'}</div>
+            <button className={styles.editProfileBtn}>
+              <IconEdit size={10} /> Edit Profile
+            </button>
           </div>
 
           <div>
-            <div className={styles.railLabel}>Today's adventure</div>
+            <div className={styles.railLabelOnPattern}>Today's adventure</div>
             {adventure ? (
               (() => {
                 const ctx = contextById(adventure.context_id);
@@ -482,7 +637,7 @@ export default function Dashboard() {
           </div>
 
           <div>
-            <div className={styles.railLabel}>Time on goal, this wk</div>
+            <div className={styles.railLabelOnPattern}>Time on goal, this wk</div>
             <div className={styles.goalHoursCard}>
               {contexts.map((ctx) => {
                 const hrs = hoursByContext[ctx.id] || 0;

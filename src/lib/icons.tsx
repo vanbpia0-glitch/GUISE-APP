@@ -90,6 +90,7 @@ export {
   IconAward,
   IconBell,
   IconCalendarCheck,
+  IconCamera,
   IconCheck,
   IconChevronLeft,
   IconChevronRight,
