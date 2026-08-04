@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import styles from './GoalDetail.module.css';
-import modalStyles from '../../components/Modal.module.css';
 import { useStore } from '../../store/StoreContext';
 import {
   BLOCKER_RESOLUTION_COPY,
@@ -15,6 +14,7 @@ import { colorsFor } from '../../lib/contextColors';
 import ProgressRing from '../../components/ProgressRing';
 import Modal from '../../components/Modal';
 import AddBlockerForm from '../../components/AddBlockerForm';
+import AddBlockForm from '../../components/AddBlockForm';
 import { ContextIcon, IconChevronLeft, IconFlag, IconPlayerPlay, IconPlus } from '../../lib/icons';
 import { formatTimeShort } from '../../lib/format';
 
@@ -225,63 +225,9 @@ export default function GoalDetail() {
       )}
       {showAddBlock && (
         <Modal title="Add a block" onClose={() => setShowAddBlock(false)}>
-          <AddBlockForm goal={goal} onDone={() => setShowAddBlock(false)} />
+          <AddBlockForm goalId={goal.id} onDone={() => setShowAddBlock(false)} />
         </Modal>
       )}
-    </div>
-  );
-}
-
-function AddBlockForm({ goal, onDone }: { goal: { id: string; context_id: string }; onDone: () => void }) {
-  const { dispatch } = useStore();
-  const [title, setTitle] = useState('');
-  const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
-  const [start, setStart] = useState('09:00');
-  const [end, setEnd] = useState('10:00');
-
-  const canSubmit = title.trim().length > 0;
-
-  function submit() {
-    if (!canSubmit) return;
-    const scheduled_start = new Date(`${date}T${start}:00`).toISOString();
-    const scheduled_end = new Date(`${date}T${end}:00`).toISOString();
-    dispatch({
-      type: 'ADD_BLOCK',
-      payload: {
-        title: title.trim(),
-        context_id: goal.context_id,
-        goal_id: goal.id,
-        source_type: 'goal',
-        scheduled_start,
-        scheduled_end,
-      },
-    });
-    onDone();
-  }
-
-  return (
-    <div>
-      <div className={modalStyles.field}>
-        <label className={modalStyles.label}>Title</label>
-        <input className={modalStyles.input} value={title} onChange={(e) => setTitle(e.target.value)} placeholder="What are you doing?" />
-      </div>
-      <div className={modalStyles.field}>
-        <label className={modalStyles.label}>Date</label>
-        <input type="date" className={modalStyles.input} value={date} onChange={(e) => setDate(e.target.value)} />
-      </div>
-      <div style={{ display: 'flex', gap: 10 }}>
-        <div className={modalStyles.field} style={{ flex: 1 }}>
-          <label className={modalStyles.label}>Start</label>
-          <input type="time" className={modalStyles.input} value={start} onChange={(e) => setStart(e.target.value)} />
-        </div>
-        <div className={modalStyles.field} style={{ flex: 1 }}>
-          <label className={modalStyles.label}>End</label>
-          <input type="time" className={modalStyles.input} value={end} onChange={(e) => setEnd(e.target.value)} />
-        </div>
-      </div>
-      <button className={modalStyles.submitBtn} disabled={!canSubmit} onClick={submit}>
-        Add block
-      </button>
     </div>
   );
 }

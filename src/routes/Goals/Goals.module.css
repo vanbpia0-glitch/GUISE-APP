@@ -157,13 +157,25 @@
   margin-bottom: 16px;
 }
 
+/* Applied to the dnd-kit sortable wrapper (the element carrying the drag
+   listeners). touch-action: none stops the browser from treating the drag
+   gesture as a native scroll/pan on trackpad and touch input — without it,
+   dnd-kit's PointerSensor can lose the gesture to the browser before a drag
+   ever registers. user-select: none stops the press-and-move from turning
+   into a text selection instead. */
+.sortableWrapper {
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
 .goalCard {
   border-radius: var(--r-md);
   padding: 14px 16px;
   display: flex;
   align-items: center;
   gap: 10px;
-  cursor: pointer;
+  cursor: grab;
   border: none;
   text-align: left;
   font-family: inherit;
@@ -172,6 +184,7 @@
 
 .goalCardDragging {
   opacity: 0.5;
+  cursor: grabbing;
 }
 
 .rankBadge {

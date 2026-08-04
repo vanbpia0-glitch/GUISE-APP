@@ -1,4 +1,4 @@
-import { useMemo, useRef } from 'react';
+import { useMemo, useRef, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import styles from './Dashboard.module.css';
 import { useStore } from '../../store/StoreContext';
@@ -17,10 +17,26 @@ import {
   weekPlannedVsActualMinutes,
 } from '../../lib/selectors';
 import { colorsFor } from '../../lib/contextColors';
-import { ContextIcon, IconArrowRight, IconBell, IconPlayerPlay, IconPlayerStopFilled, IconPlus, IconSearch } from '../../lib/icons';
+import {
+  ContextIcon,
+  IconArrowRight,
+  IconBell,
+  IconClock,
+  IconPlayerPlay,
+  IconPlayerStopFilled,
+  IconPlus,
+  IconRefresh,
+  IconSearch,
+  IconTargetArrow,
+} from '../../lib/icons';
 import { addDays, startOfWeek, weekdayLabel, isSameDay, formatDateLong } from '../../lib/date';
 import { formatClock, formatHours, formatTimeShort } from '../../lib/format';
 import { useNow } from '../../lib/useNow';
+import { useClickOutside } from '../../lib/useClickOutside';
+import Modal from '../../components/Modal';
+import AddGoalForm from '../../components/AddGoalForm';
+import AddBlockForm from '../../components/AddBlockForm';
+import AddSystemForm from '../../components/AddSystemForm';
 
 export default function Dashboard() {
   const { state, dispatch } = useStore();
@@ -34,6 +50,23 @@ export default function Dashboard() {
   const { plannedMinutes, actualMinutes } = useMemo(() => weekPlannedVsActualMinutes(state, now), [state]);
   const activeSystems = Object.values(state.systems).filter((s) => s.active);
   const weekRef = useRef<HTMLDivElement>(null);
+
+  const [quickAddOpen, setQuickAddOpen] = useState(false);
+  const [notifOpen, setNotifOpen] = useState(false);
+  const [addModalKind, setAddModalKind] = useState<null | 'goal' | 'block' | 'system'>(null);
+  const quickAddRef = useRef<HTMLDivElement>(null);
+  const notifRef = useRef<HTMLDivElement>(null);
+  useClickOutside(quickAddRef, quickAddOpen, () => setQuickAddOpen(false));
+  useClickOutside(notifRef, notifOpen, () => setNotifOpen(false));
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.key !== 'Escape') return;
+      setQuickAddOpen(false);
+      setNotifOpen(false);
+    }
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
 
   const weekStart = startOfWeek(now);
   const weekDays = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
@@ -86,12 +119,79 @@ export default function Dashboard() {
               <IconSearch size={13} className={styles.searchIcon} />
               <input type="text" placeholder="Search" className={styles.searchInput} />
             </div>
-            <button className={styles.iconBtn} aria-label="Quick add" title="Quick add">
-              <IconPlus size={16} />
-            </button>
-            <div className={styles.bellWrap}>
-              <IconBell size={16} />
+            <div className={styles.quickAddWrap} ref={quickAddRef}>
+              <button
+                className={styles.iconBtn}
+                aria-label="Quick add"
+                title="Quick add"
+                aria-haspopup="menu"
+                aria-expanded={quickAddOpen}
+                onClick={() => {
+                  setNotifOpen(false);
+                  setQuickAddOpen((v) => !v);
+                }}
+              >
+                <IconPlus size={16} />
+              </button>
+              {quickAddOpen && (
+                <div className={styles.quickAddMenu} role="menu">
+                  <button
+                    className={styles.quickAddItem}
+                    role="menuitem"
+                    onClick={() => {
+                      setQuickAddOpen(false);
+                      setAddModalKind('goal');
+                    }}
+                  >
+                    <IconTargetArrow size={14} color="var(--sc-mid)" /> New goal
+                  </button>
+                  <button
+                    className={styles.quickAddItem}
+                    role="menuitem"
+                    onClick={() => {
+                      setQuickAddOpen(false);
+                      setAddModalKind('block');
+                    }}
+                  >
+                    <IconClock size={14} color="var(--grounds-mid)" /> New block
+                  </button>
+                  <button
+                    className={styles.quickAddItem}
+                    role="menuitem"
+                    onClick={() => {
+                      setQuickAddOpen(false);
+                      setAddModalKind('system');
+                    }}
+                  >
+                    <IconRefresh size={14} color="var(--me-mid)" /> New system
+                  </button>
+                </div>
+              )}
+            </div>
+            <div className={styles.bellWrap} ref={notifRef}>
+              <button
+                className={styles.iconBtn}
+                aria-label="Notifications"
+                title="Notifications"
+                aria-haspopup="dialog"
+                aria-expanded={notifOpen}
+                onClick={() => {
+                  setQuickAddOpen(false);
+                  setNotifOpen((v) => !v);
+                }}
+              >
+                <IconBell size={16} />
+              </button>
               {upcoming.length > 0 && <div className={styles.bellDot} />}
+              {notifOpen && (
+                <div className={styles.notifPanel} role="dialog" aria-label="Notifications">
+                  <div className={styles.notifHeader}>Notifications</div>
+                  {/* TODO: no Notification entity exists yet — once one does (e.g. blocker
+                      flagged, milestone hit, adventure not started by midday), replace this
+                      stub with real records instead of a hardcoded empty state. */}
+                  <div className={styles.notifEmpty}>No notifications yet.</div>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -438,6 +538,22 @@ export default function Dashboard() {
           </div>
         </div>
       </aside>
+
+      {addModalKind === 'goal' && (
+        <Modal title="Add a goal" onClose={() => setAddModalKind(null)}>
+          <AddGoalForm onDone={() => setAddModalKind(null)} />
+        </Modal>
+      )}
+      {addModalKind === 'block' && (
+        <Modal title="Add a block" onClose={() => setAddModalKind(null)}>
+          <AddBlockForm onDone={() => setAddModalKind(null)} />
+        </Modal>
+      )}
+      {addModalKind === 'system' && (
+        <Modal title="Add a system" onClose={() => setAddModalKind(null)}>
+          <AddSystemForm onDone={() => setAddModalKind(null)} />
+        </Modal>
+      )}
     </div>
   );
 }

@@ -429,7 +429,15 @@ function SortableGoalCard({ goal, rank, onOpen }: { goal: Goal; rank: number; on
   };
 
   return (
-    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      {...listeners}
+      className={styles.sortableWrapper}
+      data-testid="goal-card"
+      data-goal-id={goal.id}
+    >
       <button
         className={`${styles.goalCard} ${isDragging ? styles.goalCardDragging : ''}`}
         style={{ background: colors?.tint }}
