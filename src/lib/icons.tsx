@@ -89,6 +89,7 @@ export {
   IconArrowsSort,
   IconAward,
   IconBell,
+  IconBulb,
   IconCalendarCheck,
   IconCamera,
   IconCheck,
