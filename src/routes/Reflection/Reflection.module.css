@@ -91,6 +91,7 @@
 .ringSvg {
   max-width: 100%;
   height: auto;
+  overflow: visible;
 }
 
 .ringLegend {
@@ -294,7 +295,7 @@
 .calendar {
   opacity: 0.4;
   padding: 0 6px;
-  max-width: 340px;
+  max-width: 520px;
   margin: 0 auto;
 }
 
@@ -336,8 +337,8 @@
   background: var(--cream);
   border-radius: var(--r-lg);
   margin: 26px auto 40px;
-  max-width: 400px;
-  padding: 28px 30px 32px;
+  max-width: 520px;
+  padding: 28px 34px 32px;
   box-shadow: 0 12px 34px rgba(41, 39, 35, 0.18);
   position: relative;
 }
@@ -417,7 +418,7 @@
   border: 1px solid var(--border);
   border-radius: var(--r-md);
   padding: 16px 18px;
-  min-height: 110px;
+  min-height: 150px;
   font-size: 13px;
   font-family: inherit;
   color: var(--ink);

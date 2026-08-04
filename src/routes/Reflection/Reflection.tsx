@@ -47,7 +47,7 @@ function MomentumRing({ blocks, consistency, energy, label }: { blocks: number; 
     { d: 'M75 185 A70 70 0 0 1 225 185', len: 220, pct: energy, color: '#f6a360' },
   ];
   return (
-    <svg width="300" height="200" viewBox="0 0 300 200" className={styles.ringSvg}>
+    <svg width="330" height="210" viewBox="-15 -8 330 210" className={styles.ringSvg}>
       {arcs.map((a, i) => (
         <path key={`t${i}`} d={a.d} stroke="rgba(255,255,255,0.12)" strokeWidth="24" fill="none" strokeLinecap="round" />
       ))}
