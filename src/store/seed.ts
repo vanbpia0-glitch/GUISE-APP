@@ -76,6 +76,17 @@ export function buildSeedState(): AppState {
       active: true,
       created_at: iso(now),
     },
+    {
+      id: makeId('ctx'),
+      name: 'Side hustle',
+      role_description: 'Paused — merged into SC',
+      color_key: 'yellow',
+      icon: 'bulb',
+      sort_order: 4,
+      active: false,
+      archived_at: iso(addDays(now, -20)),
+      created_at: iso(addDays(now, -120)),
+    },
   ];
   const [sc, grounds, van, me] = contexts;
 

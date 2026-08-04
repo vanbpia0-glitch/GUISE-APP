@@ -65,10 +65,18 @@ export default function ContextsSettings() {
         </div>
         <div className={styles.overviewCard}>
           <svg width="72" height="52" viewBox="0 0 140 90">
+            <defs>
+              <linearGradient id="hatsRingGrad" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stopColor="var(--grounds-base)" />
+                <stop offset="35%" stopColor="var(--me-base)" />
+                <stop offset="70%" stopColor="var(--sc-base)" />
+                <stop offset="100%" stopColor="var(--van-base)" />
+              </linearGradient>
+            </defs>
             <path d="M8 78 A62 62 0 0 1 132 78" stroke="var(--surface-tint)" strokeWidth="14" fill="none" strokeLinecap="round" />
             <path
               d="M8 78 A62 62 0 0 1 132 78"
-              stroke="var(--sc-base)"
+              stroke="url(#hatsRingGrad)"
               strokeWidth="14"
               fill="none"
               strokeLinecap="round"
