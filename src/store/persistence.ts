@@ -1,7 +1,7 @@
 import type { AppState } from '../types';
 import { buildSeedState } from './seed';
 
-const STORAGE_KEY = 'guise-state-v1';
+const STORAGE_KEY = 'guise-state-v2';
 
 export function loadState(): AppState {
   try {
