@@ -68,6 +68,13 @@ export default function Stats() {
 
   const last4 = [-3, -2, -1, 0].map((o) => weeklyMomentum(state, addDays(weekStart, o * 7), now).momentum);
 
+  // Percentile of this week vs. the prior 7 weeks (self-referential, not cross-user).
+  const last8 = [-7, -6, -5, -4, -3, -2, -1, 0].map((o) => weeklyMomentum(state, addDays(weekStart, o * 7), now).momentum);
+  const priorWeeks = last8.slice(0, -1);
+  const currentWk = last8[last8.length - 1];
+  const betterThanPct =
+    priorWeeks.length === 0 ? 0 : Math.round((priorWeeks.filter((m) => m < currentWk).length / priorWeeks.length) * 100);
+
   const sessions = sessionsInWeek(state, weekStart);
   const avgSessionMin = sessions.length === 0 ? 0 : Math.round(sessions.reduce((s, w) => s + (w.duration_minutes || 0), 0) / sessions.length);
   const histogram = sessionLengthHistogram(sessions);
@@ -170,7 +177,7 @@ export default function Stats() {
                 <IconChevronRight size={13} />
               </button>
             </div>
-            <button className={styles.shareBtn} style={{ background: 'white' }} onClick={shareRecap}>
+            <button className={styles.shareBtn} onClick={shareRecap}>
               <IconShare2 size={12} /> {shared ? 'Copied!' : 'Share recap'}
             </button>
           </div>
@@ -178,7 +185,7 @@ export default function Stats() {
       </div>
 
       <div className={styles.grid}>
-        <div className={styles.card} style={{ gridColumn: 'span 3', background: 'white' }}>
+        <div className={styles.card} style={{ gridColumn: 'span 3' }}>
           <div className={styles.cardLabel}>Momentum · this week</div>
           <div className={styles.momentumRow}>
             <div className={styles.momentumLegend}>
@@ -197,17 +204,37 @@ export default function Stats() {
             </div>
             <svg width="80" height="80" viewBox="0 0 80 80">
               <circle cx="40" cy="40" r="32" fill="none" stroke="rgba(41,39,35,0.08)" strokeWidth="10" />
-              <circle
-                cx="40"
-                cy="40"
-                r="32"
-                fill="none"
-                stroke="var(--grounds-base)"
-                strokeWidth="10"
-                strokeDasharray={`${(momentum.blocksPct / 100) * 2 * Math.PI * 32} ${2 * Math.PI * 32}`}
-                strokeLinecap="round"
-                transform="rotate(-90 40 40)"
-              />
+              {(() => {
+                const circ = 2 * Math.PI * 32;
+                const parts = [
+                  { pct: momentum.blocksPct, color: 'var(--grounds-base)' },
+                  { pct: momentum.consistencyPct, color: 'var(--me-base)' },
+                  { pct: momentum.energyPct, color: 'var(--sc-base)' },
+                ];
+                const sum = parts.reduce((s, p) => s + p.pct, 0) || 1;
+                const filled = (momentum.momentum / 100) * circ;
+                let cursor = 0;
+                return parts.map((p, i) => {
+                  const len = (p.pct / sum) * filled;
+                  const el = (
+                    <circle
+                      key={i}
+                      cx="40"
+                      cy="40"
+                      r="32"
+                      fill="none"
+                      stroke={p.color}
+                      strokeWidth="10"
+                      strokeDasharray={`${len} ${circ}`}
+                      strokeDashoffset={-cursor}
+                      strokeLinecap="butt"
+                      transform="rotate(-90 40 40)"
+                    />
+                  );
+                  cursor += len;
+                  return el;
+                });
+              })()}
               <text x="40" y="45" textAnchor="middle" fontSize="17" fontWeight="800" fill="var(--ink)">
                 {momentum.momentum}%
               </text>
@@ -219,36 +246,62 @@ export default function Stats() {
         </div>
 
         <div className={`${styles.card} ${styles.avgCard}`} style={{ gridColumn: 'span 3' }}>
-          <div className={styles.avgLabel}>You're at, vs. pace</div>
-          <div className={styles.avgValue}>{vsAvgPct >= 0 ? '+' : ''}{vsAvgPct}%</div>
-          <div className={styles.sparkLabels} style={{ marginBottom: 6 }}>
-            {last4.map((m, i) => (
-              <span key={i}>{m}%</span>
-            ))}
-          </div>
-          <div className={styles.avgNote}>
-            {thisWeekHours}h so far vs {Math.round(paceAvgHours * 10) / 10}h pace ({avgHours}h full-week average)
-          </div>
+          <div className={styles.avgLabel}>You're better than</div>
+          <div className={styles.avgValue}>{betterThanPct}%</div>
+          {(() => {
+            const w = 160;
+            const h = 40;
+            const n = last8.length;
+            const max = Math.max(1, ...last8);
+            const pts = last8.map((m, i) => {
+              const x = (i / (n - 1)) * w;
+              const y = h - 4 - (m / max) * (h - 10);
+              return { x, y };
+            });
+            const line = pts.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(' ');
+            const last = pts[pts.length - 1];
+            return (
+              <svg width="100%" height={h} viewBox={`0 0 ${w} ${h}`} className={styles.betterSpark}>
+                <path d={line} fill="none" stroke="rgba(41,35,80,0.35)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                <line x1={last.x} y1={last.y - 2} x2={last.x} y2={h - 4} stroke="var(--me-deep)" strokeWidth="2" />
+                <circle cx={last.x} cy={last.y} r="4" fill="var(--me-deep)" />
+              </svg>
+            );
+          })()}
+          <div className={styles.avgNote}>You're the marked point on your own weekly curve</div>
         </div>
 
-        <div className={styles.card} style={{ gridColumn: 'span 3', background: 'white' }}>
+        <div className={styles.card} style={{ gridColumn: 'span 3' }}>
           <div className={styles.cardLabel}>Last 4 weeks</div>
-          <svg width="100%" height="50" viewBox="0 0 160 55">
-            <polyline
-              points={last4.map((m, i) => `${i * 53},${50 - m * 0.4}`).join(' ')}
-              fill="none"
-              stroke="var(--grounds-base)"
-              strokeWidth="3"
-              strokeLinecap="round"
-            />
+          {(() => {
+            const w = 160;
+            const h = 60;
+            const pts = last4.map((m, i) => ({ x: (i / 3) * w, y: h - 8 - (m / 100) * (h - 16), m }));
+            const line = pts.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(' ');
+            const area = `${line} L ${w} ${h} L 0 ${h} Z`;
+            return (
+              <svg width="100%" height={h} viewBox={`0 0 ${w} ${h}`}>
+                {[12, 30, 48].map((y) => (
+                  <line key={y} x1="0" y1={y} x2={w} y2={y} stroke="rgba(41,39,35,0.08)" strokeWidth="1" />
+                ))}
+                <path d={area} fill="var(--grounds-base)" opacity="0.12" />
+                <path d={line} fill="none" stroke="var(--grounds-base)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+                {pts.map((p, i) => (
+                  <circle key={i} cx={p.x} cy={p.y} r={i === 3 ? 4.5 : 3} fill={i === 3 ? 'var(--grounds-base)' : 'var(--green-40)'} />
+                ))}
+              </svg>
+            );
+          })()}
+          <div className={styles.sparkLabels}>
             {last4.map((m, i) => (
-              <circle key={i} cx={i * 53} cy={50 - m * 0.4} r={i === 3 ? 4.5 : 3} fill="var(--grounds-base)" />
+              <span key={i} style={i === 3 ? { color: 'var(--grounds-mid)', fontWeight: 700 } : undefined}>
+                {m}%
+              </span>
             ))}
-          </svg>
-          <div className={styles.sparkNote}>Momentum trend</div>
+          </div>
         </div>
 
-        <div className={styles.card} style={{ gridColumn: 'span 3', background: 'white', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+        <div className={styles.card} style={{ gridColumn: 'span 3', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
           <div className={styles.cardLabel}>This week's hours</div>
           <div className={styles.vsAvgTop}>
             <span className={styles.vsAvgValue}>{thisWeekHours}h</span>
@@ -256,7 +309,7 @@ export default function Stats() {
           <div className={styles.vsAvgNote}>{avgHours > 0 ? `avg week is ${avgHours}h` : 'building your average'}</div>
         </div>
 
-        <div className={styles.card} style={{ gridColumn: 'span 8', background: 'white' }}>
+        <div className={styles.card} style={{ gridColumn: 'span 8' }}>
           <div className={styles.momentumRow} style={{ marginBottom: 14 }}>
             <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--ink)' }}>Focus hours by day</span>
             <span style={{ fontSize: 10.5, color: 'var(--muted-2)' }}>{thisWeekHours}h total</span>
@@ -301,7 +354,7 @@ export default function Stats() {
           </div>
         </div>
 
-        <div className={styles.card} style={{ gridColumn: 'span 5', background: 'white' }}>
+        <div className={styles.card} style={{ gridColumn: 'span 5' }}>
           <div className={styles.todTitle}>Time-of-day pattern</div>
           <div className={styles.todTiles}>
             <div className={styles.todTile} style={{ background: 'rgba(125,148,77,0.18)' }}>
@@ -335,7 +388,7 @@ export default function Stats() {
           <div className={styles.todNote}>{todNote}</div>
         </div>
 
-        <div className={styles.card} style={{ gridColumn: 'span 4', background: 'white' }}>
+        <div className={styles.card} style={{ gridColumn: 'span 4' }}>
           <div className={styles.donutTitle}>Hours came from</div>
           <div className={styles.donutRow}>
             <svg width="90" height="90" viewBox="0 0 70 70">
@@ -423,7 +476,7 @@ export default function Stats() {
           </div>
         </div>
 
-        <div className={styles.card} style={{ gridColumn: 'span 4', background: 'white' }}>
+        <div className={styles.card} style={{ gridColumn: 'span 4' }}>
           <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--ink)', marginBottom: 28 }}>Hours by context</div>
           <div className={styles.contextBarsWrap}>
             {contexts.map((c) => {
@@ -447,7 +500,7 @@ export default function Stats() {
           </div>
         </div>
 
-        <div className={styles.card} style={{ gridColumn: 'span 8', background: 'white' }}>
+        <div className={styles.card} style={{ gridColumn: 'span 8' }}>
           <div className={styles.consistencyHeader}>
             <span className={styles.consistencyTitle}>Monthly consistency</span>
             <div className={styles.weekNav}>
