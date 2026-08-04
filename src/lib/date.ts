@@ -83,3 +83,29 @@ export function formatTime(iso: string): string {
 export function minutesBetween(startIso: string, endIso: string): number {
   return Math.round((new Date(endIso).getTime() - new Date(startIso).getTime()) / 60000);
 }
+
+/** Inclusive [start, end] Date range for a plain "YYYY" year label. */
+export function yearDateRange(label: string): { start: Date; end: Date } {
+  const year = Number(label);
+  return {
+    start: new Date(year, 0, 1, 0, 0, 0, 0),
+    end: new Date(year, 11, 31, 23, 59, 59, 999),
+  };
+}
+
+/** "today" / "yesterday" / "N days ago" / "N weeks ago", relative to `now`. */
+export function relativeDayLabel(d: Date, now: Date): string {
+  const a = startOfDay(d).getTime();
+  const b = startOfDay(now).getTime();
+  const days = Math.round((b - a) / DAY_MS);
+  if (days <= 0) return 'today';
+  if (days === 1) return 'yesterday';
+  if (days < 7) return `${days} days ago`;
+  const weeks = Math.round(days / 7);
+  return `${weeks} week${weeks > 1 ? 's' : ''} ago`;
+}
+
+export function weeksLeft(end: Date, now: Date): number {
+  const ms = end.getTime() - now.getTime();
+  return Math.max(0, Math.ceil(ms / (7 * DAY_MS)));
+}

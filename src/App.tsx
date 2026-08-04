@@ -4,6 +4,11 @@ import Placeholder from './components/Placeholder';
 import Dashboard from './routes/Dashboard/Dashboard';
 import GoalsList from './routes/Goals/GoalsList';
 import GoalDetail from './routes/Goals/GoalDetail';
+import Systems from './routes/Systems/Systems';
+import Stats from './routes/Stats/Stats';
+import Targets from './routes/Targets/Targets';
+import ContextsSettings from './routes/Settings/ContextsSettings';
+import Reflection from './routes/Reflection/Reflection';
 
 export default function App() {
   return (
@@ -13,11 +18,11 @@ export default function App() {
         <Route path="/" element={<Dashboard />} />
         <Route path="/goals" element={<GoalsList />} />
         <Route path="/goals/:goalId" element={<GoalDetail />} />
-        <Route path="/systems" element={<Placeholder title="Systems" />} />
-        <Route path="/stats" element={<Placeholder title="Stats" />} />
-        <Route path="/targets" element={<Placeholder title="Targets" />} />
-        <Route path="/settings" element={<Placeholder title="Settings" />} />
-        <Route path="/reflection" element={<Placeholder title="Weekly Reflection" />} />
+        <Route path="/systems" element={<Systems />} />
+        <Route path="/stats" element={<Stats />} />
+        <Route path="/targets" element={<Targets />} />
+        <Route path="/settings" element={<ContextsSettings />} />
+        <Route path="/reflection" element={<Reflection />} />
         <Route path="*" element={<Placeholder title="Not found" note="Nothing lives at this URL." />} />
       </Routes>
     </div>

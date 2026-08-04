@@ -2,7 +2,7 @@ import { useState } from 'react';
 import styles from './Modal.module.css';
 import { useStore } from '../store/StoreContext';
 import { activeContexts } from '../lib/selectors';
-import type { MotivationType, SystemDomain } from '../types';
+import type { GuiseSystem, MotivationType, SystemDomain } from '../types';
 
 const DOMAIN_OPTIONS: { value: SystemDomain; label: string }[] = [
   { value: 'health', label: 'Health' },
@@ -19,33 +19,35 @@ const ENERGIZER_OPTIONS: { value: MotivationType; label: string }[] = [
 
 type Shape = 'recurring' | 'standing';
 
-export default function AddSystemForm({ onDone }: { onDone: () => void }) {
+export default function AddSystemForm({ system, onDone }: { system?: GuiseSystem; onDone: () => void }) {
   const { state, dispatch } = useStore();
   const contexts = activeContexts(state);
-  const [title, setTitle] = useState('');
-  const [contextId, setContextId] = useState(contexts[0]?.id || '');
-  const [domain, setDomain] = useState<SystemDomain>('health');
-  const [shape, setShape] = useState<Shape>('recurring');
-  const [recurrenceRule, setRecurrenceRule] = useState('');
-  const [ruleDescription, setRuleDescription] = useState('');
-  const [energizerType, setEnergizerType] = useState<MotivationType>('power');
+  const [title, setTitle] = useState(system?.title || '');
+  const [contextId, setContextId] = useState(system?.context_id || contexts[0]?.id || '');
+  const [domain, setDomain] = useState<SystemDomain>(system?.domain || 'health');
+  const [shape, setShape] = useState<Shape>(system?.rule_description ? 'standing' : 'recurring');
+  const [recurrenceRule, setRecurrenceRule] = useState(system?.recurrence_rule || '');
+  const [ruleDescription, setRuleDescription] = useState(system?.rule_description || '');
+  const [energizerType, setEnergizerType] = useState<MotivationType>(system?.energizer_type || 'power');
 
   const canSubmit =
     title.trim().length > 0 && (shape === 'recurring' ? recurrenceRule.trim().length > 0 : ruleDescription.trim().length > 0);
 
   function submit() {
     if (!canSubmit) return;
-    dispatch({
-      type: 'ADD_SYSTEM',
-      payload: {
-        context_id: contextId || undefined,
-        title: title.trim(),
-        domain,
-        recurrence_rule: shape === 'recurring' ? recurrenceRule.trim() : undefined,
-        rule_description: shape === 'standing' ? ruleDescription.trim() : undefined,
-        energizer_type: energizerType,
-      },
-    });
+    const payload = {
+      context_id: contextId || undefined,
+      title: title.trim(),
+      domain,
+      recurrence_rule: shape === 'recurring' ? recurrenceRule.trim() : undefined,
+      rule_description: shape === 'standing' ? ruleDescription.trim() : undefined,
+      energizer_type: energizerType,
+    };
+    if (system) {
+      dispatch({ type: 'UPDATE_SYSTEM', payload: { id: system.id, patch: payload } });
+    } else {
+      dispatch({ type: 'ADD_SYSTEM', payload });
+    }
     onDone();
   }
 
@@ -132,7 +134,7 @@ export default function AddSystemForm({ onDone }: { onDone: () => void }) {
         </div>
       </div>
       <button className={styles.submitBtn} disabled={!canSubmit} onClick={submit}>
-        Add system
+        {system ? 'Save changes' : 'Add system'}
       </button>
     </div>
   );
