@@ -245,12 +245,12 @@
 .vsAvgBars {
   display: flex;
   align-items: flex-end;
-  gap: 11px;
-  height: 104px;
+  gap: 12px;
+  height: 78px;
 }
 
 .vsAvgBar {
-  width: 28px;
+  width: 38px;
   border-radius: 6px 6px 0 0;
 }
 

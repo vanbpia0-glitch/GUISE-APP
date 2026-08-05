@@ -245,7 +245,7 @@ export default function Stats() {
                 Energy
               </span>
             </div>
-            <svg width="150" height="150" viewBox="0 0 80 80">
+            <svg width="130" height="130" viewBox="0 0 80 80">
               <circle cx="40" cy="40" r="32" fill="none" stroke="rgba(41,39,35,0.08)" strokeWidth="10" />
               {(() => {
                 const circ = 2 * Math.PI * 32;
@@ -292,8 +292,8 @@ export default function Stats() {
           <div className={styles.avgLabel}>You're better than</div>
           <div className={styles.avgValue}>{betterThanPct}%</div>
           {(() => {
-            const w = 160;
-            const h = 88;
+            const w = 320;
+            const h = 52;
             const n = last8.length;
             const max = Math.max(1, ...last8);
             const pts = last8.map((m, i) => {
@@ -305,7 +305,7 @@ export default function Stats() {
             const area = `${line} L ${w} ${h} L 0 ${h} Z`;
             const last = pts[pts.length - 1];
             return (
-              <svg width="100%" height={h} viewBox={`0 0 ${w} ${h}`} className={styles.betterSpark}>
+              <svg width="100%" height={h} viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none" className={styles.betterSpark}>
                 {[0.14, 0.5, 0.86].map((f) => (
                   <line key={f} x1="0" y1={h * f} x2={w} y2={h * f} stroke="rgba(41,35,80,0.1)" strokeWidth="1" />
                 ))}
@@ -325,23 +325,16 @@ export default function Stats() {
         <div className={styles.card} style={{ gridColumn: 'span 3' }}>
           <div className={styles.cardLabel}>Last 4 weeks · momentum</div>
           {(() => {
-            const w = 160;
-            const h = 96;
-            const pts = last4.map((m, i) => ({ x: 10 + (i / 3) * (w - 14), y: h - 16 - (m / 100) * (h - 26), m }));
+            const w = 320;
+            const h = 60;
+            const pts = last4.map((m, i) => ({ x: 16 + (i / 3) * (w - 24), y: h - 14 - (m / 100) * (h - 24), m }));
             const line = pts.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(' ');
-            const area = `${line} L ${pts[3].x} ${h - 14} L ${pts[0].x} ${h - 14} Z`;
-            const rows = [
-              { pct: 100, y: h - 16 - (h - 26) },
-              { pct: 50, y: h - 16 - 0.5 * (h - 26) },
-              { pct: 0, y: h - 16 },
-            ];
+            const area = `${line} L ${pts[3].x} ${h - 12} L ${pts[0].x} ${h - 12} Z`;
+            const rows = [h - 14 - (h - 24), h - 14 - 0.5 * (h - 24), h - 14];
             return (
-              <svg width="100%" height={h} viewBox={`0 0 ${w} ${h}`}>
-                {rows.map((r) => (
-                  <g key={r.pct}>
-                    <line x1="10" y1={r.y} x2={w} y2={r.y} stroke="rgba(41,39,35,0.08)" strokeWidth="1" />
-                    <text x="0" y={r.y + 3} fontSize="6.5" fill="var(--muted-2)">{r.pct}</text>
-                  </g>
+              <svg width="100%" height={h} viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none">
+                {rows.map((y) => (
+                  <line key={y} x1="0" y1={y} x2={w} y2={y} stroke="rgba(41,39,35,0.08)" strokeWidth="1" />
                 ))}
                 <path d={area} fill="var(--grounds-base)" opacity="0.12" />
                 <path d={line} fill="none" stroke="var(--grounds-base)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
