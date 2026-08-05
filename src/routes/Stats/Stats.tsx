@@ -23,6 +23,8 @@ import { addDays, elapsedFraction, isSameDay, startOfWeek, weekdayLabel } from '
 import { colorsFor } from '../../lib/contextColors';
 import {
   ContextIcon,
+  IconArrowDown,
+  IconArrowUp,
   IconAward,
   IconCalendarCheck,
   IconChevronLeft,
@@ -79,6 +81,18 @@ export default function Stats() {
   const avgSessionMin = sessions.length === 0 ? 0 : Math.round(sessions.reduce((s, w) => s + (w.duration_minutes || 0), 0) / sessions.length);
   const histogram = sessionLengthHistogram(sessions);
   const maxHisto = Math.max(1, ...Object.values(histogram));
+  const SESSION_BUCKET_PHRASE: Record<string, string> = {
+    '15m': '15 minutes',
+    '30m': 'half an hour',
+    '1h': 'an hour',
+    '1.5h': '90 minutes',
+    '2h+': 'two hours or more',
+  };
+  const peakBucket = Object.entries(histogram).sort((a, b) => b[1] - a[1])[0];
+  const sessionsNote =
+    sessions.length === 0
+      ? 'No focus sessions logged yet this week'
+      : `Most sessions land around ${SESSION_BUCKET_PHRASE[peakBucket?.[0]] || peakBucket?.[0]}`;
 
   const tod = timeOfDayPattern(sessions);
   const source = hoursBySourceType(state, weekStart, now);
@@ -292,6 +306,7 @@ export default function Stats() {
               </svg>
             );
           })()}
+          <div className={styles.spark4Note}>Best stretch in 4 weeks</div>
           <div className={styles.sparkLabels}>
             {last4.map((m, i) => (
               <span key={i} style={i === 3 ? { color: 'var(--grounds-mid)', fontWeight: 700 } : undefined}>
@@ -301,12 +316,28 @@ export default function Stats() {
           </div>
         </div>
 
-        <div className={styles.card} style={{ gridColumn: 'span 3', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-          <div className={styles.cardLabel}>This week's hours</div>
-          <div className={styles.vsAvgTop}>
-            <span className={styles.vsAvgValue}>{thisWeekHours}h</span>
+        <div className={styles.card} style={{ gridColumn: 'span 3', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div>
+            <div className={styles.cardLabel}>Vs your average</div>
+            <div className={styles.vsAvgRow}>
+              <span className={styles.vsAvgValue}>{vsAvgPct >= 0 ? '+' : ''}{vsAvgPct}%</span>
+              {vsAvgPct >= 0 ? <IconArrowUp size={13} color="var(--grounds-mid)" /> : <IconArrowDown size={13} color="var(--sc-mid)" />}
+            </div>
+            <div className={styles.vsAvgNote}>
+              {vsAvgPct >= 0 ? 'Above' : 'Below'} typical week
+            </div>
           </div>
-          <div className={styles.vsAvgNote}>{avgHours > 0 ? `avg week is ${avgHours}h` : 'building your average'}</div>
+          {(() => {
+            const maxH = Math.max(avgHours, thisWeekHours, 0.1);
+            const avgPct = Math.max(12, (avgHours / maxH) * 100);
+            const weekPct = Math.max(12, (thisWeekHours / maxH) * 100);
+            return (
+              <div className={styles.vsAvgBars}>
+                <div className={styles.vsAvgBar} style={{ height: `${avgPct}%`, background: 'rgba(41,39,35,0.15)' }} />
+                <div className={styles.vsAvgBar} style={{ height: `${weekPct}%`, background: 'var(--grounds-base)' }} />
+              </div>
+            );
+          })()}
         </div>
 
         <div className={styles.card} style={{ gridColumn: 'span 8' }}>
@@ -318,7 +349,8 @@ export default function Stats() {
             {weekDays.map((day) => {
               const blocks = blocksOnDay(state, day);
               const minutes = blocks.reduce((s, b) => s + blockActualMinutes(state, b, now), 0);
-              const heightPct = Math.max(3, (minutes / maxDayMinutes) * 100);
+              // Cap the tallest bar at 82% so it never touches the card's top edge / total label.
+              const heightPct = Math.max(3, (minutes / maxDayMinutes) * 82);
               const today_ = isSameDay(day, now);
               return (
                 <div className={styles.dayBarCol} key={day.toISOString()}>
@@ -338,6 +370,7 @@ export default function Stats() {
                 Focus sessions
               </span>
             </div>
+            <span className={styles.sessionsNote}>{sessionsNote}</span>
           </div>
           <div className={styles.sessionsBig}>{sessions.length}</div>
           <div className={styles.sessionsSub}>avg {avgSessionMin}min each</div>
