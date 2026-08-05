@@ -212,6 +212,7 @@ export default function Systems() {
       </div>
 
       <div className={styles.middle}>
+        <div className={styles.middleInner}>
         <svg className={styles.middleBg} viewBox="0 0 480 1700" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
           <rect width="480" height="1700" fill="var(--van-tint)" />
           <g fill="var(--sc-base)" opacity="0.22">
@@ -235,8 +236,7 @@ export default function Systems() {
             <path d="M150 1660 C 210 1644 256 1692 235 1750 C 216 1800 152 1806 122 1760 C 94 1716 100 1678 150 1660 Z" />
           </g>
         </svg>
-
-        <div className={styles.middleInner}>
+        <div className={styles.middleContent}>
           <div className={styles.middleHeader}>
             <span className={styles.middleTitle}>Your systems</span>
             <button className={styles.middleAdd} onClick={() => setShowAdd(true)} aria-label="Add system">
@@ -300,6 +300,7 @@ export default function Systems() {
             );
           })}
           {recurring.length === 0 && <div className={styles.emptyMiddle}>No recurring systems yet — add one from the left.</div>}
+        </div>
         </div>
       </div>
 
