@@ -576,7 +576,7 @@ export default function Stats() {
           </div>
         </div>
 
-        <div className={styles.card} style={{ gridColumn: 'span 4', alignSelf: 'start' }}>
+        <div className={`${styles.card} ${styles.contextCard}`} style={{ gridColumn: 'span 4' }}>
           <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--ink)', marginBottom: 20 }}>Hours by context</div>
           <div className={styles.contextBarsWrap}>
             {contexts.map((c) => {
@@ -588,7 +588,7 @@ export default function Stats() {
                   <span className={styles.contextBarValue} style={{ color: colors.deep }}>
                     {hrs}h
                   </span>
-                  <div className={styles.contextBar} style={{ height: `${Math.max(4, (hrs / maxContextHours) * 90)}px`, background: colors.base }} />
+                  <div className={styles.contextBar} style={{ height: `${Math.max(6, (hrs / maxContextHours) * 150)}px`, background: colors.base }} />
                   <div className={styles.contextBarDot} style={{ background: colors.base }}>
                     <ContextIcon name={c.icon} size={12} color="white" />
                   </div>
@@ -666,7 +666,7 @@ export default function Stats() {
                 <div className={styles.sideLabel}>Days active</div>
                 <div className={styles.sideValue}>
                   {consistency.activeDays}
-                  <span style={{ fontSize: 18, color: 'var(--muted-2)', fontWeight: 600 }}> / {consistency.days.length}</span>
+                  <span style={{ fontSize: 26, color: 'var(--muted-2)', fontWeight: 600 }}> / {consistency.days.length}</span>
                 </div>
               </div>
               <div>

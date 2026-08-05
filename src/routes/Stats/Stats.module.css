@@ -554,11 +554,17 @@
   color: #ffbd1a;
 }
 
+.contextCard {
+  display: flex;
+  flex-direction: column;
+}
+
 .contextBarsWrap {
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
   gap: 8px;
+  flex: 1;
 }
 
 .contextBarCol {
@@ -607,7 +613,7 @@
   color: var(--ink-soft);
   border-top: 1px solid rgba(41, 39, 35, 0.08);
   padding-top: 14px;
-  margin-top: 18px;
+  margin-top: 24px;
 }
 
 .consistencyHeader {
@@ -709,23 +715,23 @@
 }
 
 .sideLabel {
-  font-size: 12px;
+  font-size: 12.5px;
   color: var(--ink-soft);
   text-transform: uppercase;
   letter-spacing: 0.3px;
   font-weight: 700;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 }
 
 .sideValue {
-  font-size: 36px;
+  font-size: 52px;
   font-weight: 800;
   color: var(--ink);
   line-height: 1;
 }
 
 .sideValueSmall {
-  font-size: 22px;
+  font-size: 26px;
   font-weight: 700;
   color: var(--grounds-mid);
 }
