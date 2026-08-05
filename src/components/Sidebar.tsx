@@ -1,6 +1,7 @@
 import { NavLink } from 'react-router-dom';
 import styles from './Sidebar.module.css';
 import {
+  IconCalendarMonth,
   IconChartBar,
   IconFlag3,
   IconHome,
@@ -11,6 +12,7 @@ import {
 
 const NAV_ITEMS = [
   { to: '/', label: 'Dashboard', icon: IconHome, end: true },
+  { to: '/calendar', label: 'Calendar', icon: IconCalendarMonth, end: false },
   { to: '/goals', label: 'Goals', icon: IconTargetArrow, end: false },
   { to: '/systems', label: 'Systems', icon: IconRefresh, end: false },
   { to: '/stats', label: 'Stats', icon: IconChartBar, end: false },

@@ -284,7 +284,12 @@ export default function Dashboard() {
         </div>
 
         <div className={styles.panel} ref={weekRef}>
-          <div className={styles.panelTitle}>Upcoming activity</div>
+          <div className={styles.panelTitle}>
+            Upcoming activity
+            <Link to="/calendar" className={styles.seeAll}>
+              Open calendar →
+            </Link>
+          </div>
           <div className={styles.activityWrap}>
             <div className={styles.activityLabelsRow}>
               {activityLabels.map((label, i) => (

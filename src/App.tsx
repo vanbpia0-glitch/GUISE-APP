@@ -9,6 +9,7 @@ import Stats from './routes/Stats/Stats';
 import Targets from './routes/Targets/Targets';
 import ContextsSettings from './routes/Settings/ContextsSettings';
 import Reflection from './routes/Reflection/Reflection';
+import Calendar from './routes/Calendar/Calendar';
 
 export default function App() {
   return (
@@ -18,6 +19,7 @@ export default function App() {
         <Route path="/" element={<Dashboard />} />
         <Route path="/goals" element={<GoalsList />} />
         <Route path="/goals/:goalId" element={<GoalDetail />} />
+        <Route path="/calendar" element={<Calendar />} />
         <Route path="/systems" element={<Systems />} />
         <Route path="/stats" element={<Stats />} />
         <Route path="/targets" element={<Targets />} />
