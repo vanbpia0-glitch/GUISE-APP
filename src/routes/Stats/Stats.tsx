@@ -612,7 +612,7 @@ export default function Stats() {
         <div className={styles.card} style={{ gridColumn: 'span 8' }}>
           <div className={styles.consistencyHeader}>
             <span className={styles.consistencyTitle}>Monthly consistency</span>
-            <div className={styles.consistencyHeaderRight}>
+            <div className={styles.consistencyHeaderMid}>
               <div className={styles.weekNav}>
                 <button className={styles.navBtn} onClick={() => setMonthOffset((m) => m - 1)} aria-label="Previous month">
                   <IconChevronLeft size={11} />
@@ -636,6 +636,7 @@ export default function Stats() {
                 <span>More</span>
               </div>
             </div>
+            <div className={styles.consistencyHeaderStat}>Days active</div>
           </div>
           <div className={styles.consistencyBody}>
             <div className={styles.heatmapWrap}>
@@ -676,7 +677,6 @@ export default function Stats() {
             </div>
             <div className={styles.consistencySide}>
               <div>
-                <div className={styles.sideLabel}>Days active</div>
                 <div className={styles.sideValue}>
                   {consistency.activeDays}
                   <span style={{ fontSize: 26, color: 'var(--muted-2)', fontWeight: 600 }}> / {consistency.days.length}</span>
