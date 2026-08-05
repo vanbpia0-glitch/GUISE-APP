@@ -104,7 +104,7 @@ export default function Systems() {
             <div className={styles.ruleCard} key={s.id} style={{ background: colors?.tint || 'var(--surface-tint)' }}>
               <div className={styles.ruleTop}>
                 <div className={styles.ruleIconBox}>
-                  {ctx ? <ContextIcon name={ctx.icon} size={16} color={colors?.mid} /> : <IconRefresh size={16} color="var(--muted-2)" />}
+                  {ctx ? <ContextIcon name={ctx.icon} size={19} color={colors?.mid} /> : <IconRefresh size={19} color="var(--muted-2)" />}
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div className={styles.ruleTitle} style={{ color: colors?.deep || 'var(--ink)' }}>
@@ -125,7 +125,7 @@ export default function Systems() {
 
         <button className={styles.addNewBtn} onClick={() => setShowAdd(true)} type="button">
           <div className={styles.addNewIcon}>
-            <IconPlus size={13} color="white" />
+            <IconPlus size={15} color="white" />
           </div>
           <span className={styles.addNewLabel}>Add new system</span>
         </button>
@@ -204,7 +204,7 @@ export default function Systems() {
           <div className={styles.middleHeader}>
             <span className={styles.middleTitle}>Your systems</span>
             <button className={styles.middleAdd} onClick={() => setShowAdd(true)} aria-label="Add system">
-              <IconPlus size={16} color="var(--sc-deep)" />
+              <IconPlus size={18} color="var(--sc-deep)" />
             </button>
           </div>
 
@@ -216,7 +216,7 @@ export default function Systems() {
               <div className={styles.sysCard} key={s.id}>
                 <div className={styles.sysTop}>
                   <div className={styles.sysIconBox}>
-                    {ctx ? <ContextIcon name={ctx.icon} size={18} color={colors?.mid} /> : <IconRefresh size={18} color="var(--muted-2)" />}
+                    {ctx ? <ContextIcon name={ctx.icon} size={22} color={colors?.mid} /> : <IconRefresh size={22} color="var(--muted-2)" />}
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div className={styles.sysTitle}>{s.title}</div>
@@ -271,7 +271,7 @@ export default function Systems() {
         <div>
           <div className={styles.sectionLabel}>This week</div>
           <div className={styles.ringWrap}>
-            <svg width="240" height="150" viewBox="0 0 240 150" className={styles.ringSvg}>
+            <svg width="270" height="169" viewBox="0 0 240 150" className={styles.ringSvg}>
               <defs>
                 <linearGradient id="sysRingGrad" x1="0%" y1="0%" x2="100%" y2="0%">
                   <stop offset="0%" stopColor="var(--grounds-base)" />
@@ -333,7 +333,7 @@ export default function Systems() {
         <div className={styles.byDomainCard}>
           <div className={styles.byDomainTitle}>By domain</div>
           <div className={styles.byDomainRow}>
-            <svg width="80" height="80" viewBox="0 0 80 80">
+            <svg width="92" height="92" viewBox="0 0 80 80">
               <circle cx="40" cy="40" r={donutR} fill="none" stroke="rgba(0,0,0,0.06)" strokeWidth="14" />
               {donutSegs.map((seg) => (
                 <circle

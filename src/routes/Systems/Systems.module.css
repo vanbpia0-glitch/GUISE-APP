@@ -6,26 +6,26 @@
 }
 
 .leftRail {
-  width: 240px;
+  width: 288px;
   flex-shrink: 0;
   border-right: 1px solid var(--border);
-  padding: 26px 20px;
+  padding: 30px 26px;
   overflow-y: auto;
   background: var(--surface);
 }
 
 .leftHeader {
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 700;
   color: var(--ink);
-  margin-bottom: 14px;
+  margin-bottom: 16px;
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
 .viewAll {
-  font-size: 10.5px;
+  font-size: 12px;
   color: var(--sc-mid);
   font-weight: 700;
   cursor: pointer;
@@ -33,20 +33,20 @@
 
 .ruleCard {
   border-radius: var(--r-lg);
-  padding: 14px;
-  margin-bottom: 10px;
+  padding: 16px 18px;
+  margin-bottom: 12px;
 }
 
 .ruleTop {
   display: flex;
-  gap: 10px;
+  gap: 12px;
   align-items: flex-start;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
 
 .ruleIconBox {
-  width: 34px;
-  height: 34px;
+  width: 40px;
+  height: 40px;
   border-radius: var(--r-md);
   background: rgba(255, 255, 255, 0.6);
   border: 1px solid rgba(255, 255, 255, 0.7);
@@ -57,37 +57,37 @@
 }
 
 .ruleTitle {
-  font-size: 12.5px;
+  font-size: 14px;
   font-weight: 700;
 }
 
 .ruleMeta {
-  font-size: 9.5px;
-  margin-top: 1px;
+  font-size: 11px;
+  margin-top: 2px;
 }
 
 .ruleDesc {
-  font-size: 10.5px;
-  line-height: 1.4;
+  font-size: 12px;
+  line-height: 1.45;
   opacity: 0.85;
 }
 
 .addNewBtn {
   background: var(--ink);
   border-radius: var(--r-lg);
-  padding: 12px 14px;
+  padding: 14px 16px;
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin: 8px 0 22px;
+  gap: 12px;
+  margin: 10px 0 24px;
   border: none;
   width: 100%;
   cursor: pointer;
 }
 
 .addNewIcon {
-  width: 26px;
-  height: 26px;
+  width: 30px;
+  height: 30px;
   border-radius: var(--r-sm);
   background: var(--sc-base);
   display: flex;
@@ -97,7 +97,7 @@
 }
 
 .addNewLabel {
-  font-size: 11.5px;
+  font-size: 13px;
   font-weight: 600;
   color: white;
 }
@@ -140,15 +140,15 @@
 }
 
 .middleTitle {
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 700;
   color: var(--sc-deep);
   text-shadow: 0 1px 2px rgba(255, 255, 255, 0.4);
 }
 
 .middleAdd {
-  width: 34px;
-  height: 34px;
+  width: 40px;
+  height: 40px;
   border-radius: var(--r-md);
   background: rgba(255, 255, 255, 0.4);
   backdrop-filter: blur(14px);
@@ -165,8 +165,8 @@
   background: rgba(255, 255, 255, 0.4);
   border: 1px solid rgba(255, 255, 255, 0.55);
   border-radius: var(--r-lg);
-  padding: 18px;
-  margin-bottom: 14px;
+  padding: 22px 24px;
+  margin-bottom: 16px;
   box-shadow: var(--k-shadow-md);
 }
 
@@ -178,8 +178,8 @@
 }
 
 .sysIconBox {
-  width: 38px;
-  height: 38px;
+  width: 46px;
+  height: 46px;
   border-radius: var(--r-md);
   background: rgba(255, 255, 255, 0.5);
   border: 1px solid rgba(255, 255, 255, 0.6);
@@ -190,15 +190,15 @@
 }
 
 .sysTitle {
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 700;
   color: var(--ink);
 }
 
 .sysMeta {
-  font-size: 10.5px;
+  font-size: 12px;
   color: var(--ink-soft);
-  margin-top: 1px;
+  margin-top: 2px;
 }
 
 .sysActions {
@@ -211,8 +211,8 @@
   background: rgba(255, 255, 255, 0.5);
   border: none;
   border-radius: var(--r-sm);
-  width: 26px;
-  height: 26px;
+  width: 30px;
+  height: 30px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -221,16 +221,16 @@
 
 .tagRow {
   display: flex;
-  gap: 6px;
-  margin-bottom: 12px;
+  gap: 7px;
+  margin-bottom: 14px;
   flex-wrap: wrap;
 }
 
 .tag {
-  font-size: 9px;
+  font-size: 10.5px;
   font-weight: 600;
   background: rgba(255, 255, 255, 0.5);
-  padding: 3px 9px;
+  padding: 4px 11px;
   border-radius: var(--r-pill);
   display: flex;
   align-items: center;
@@ -247,14 +247,14 @@
 }
 
 .dotDay {
-  font-size: 8.5px;
+  font-size: 10px;
   color: var(--ink-soft);
-  margin-bottom: 4px;
+  margin-bottom: 5px;
 }
 
 .dot {
-  width: 16px;
-  height: 16px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
   margin: 0 auto;
 }
@@ -265,24 +265,24 @@
 }
 
 .rightRail {
-  width: 300px;
+  width: 336px;
   flex-shrink: 0;
   border-left: 1px solid var(--border);
-  padding: 26px 24px;
+  padding: 30px 28px;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 22px;
+  gap: 24px;
   background: var(--surface);
 }
 
 .sectionLabel {
-  font-size: 11px;
+  font-size: 12.5px;
   color: var(--muted-2);
   text-transform: uppercase;
   letter-spacing: 0.5px;
   font-weight: 700;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 
 .ringWrap {
@@ -306,15 +306,15 @@
 }
 
 .legendItem {
-  font-size: 10.5px;
+  font-size: 12px;
   display: flex;
   align-items: center;
   gap: 5px;
 }
 
 .legendDot {
-  width: 8px;
-  height: 8px;
+  width: 9px;
+  height: 9px;
   border-radius: 50%;
   display: inline-block;
 }
@@ -322,10 +322,10 @@
 .streakLine {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 7px;
   border-top: 1px solid var(--surface-tint);
-  padding-top: 12px;
-  font-size: 12px;
+  padding-top: 14px;
+  font-size: 13px;
   color: var(--muted);
 }
 
@@ -335,37 +335,37 @@
   background: rgba(245, 243, 240, 0.6);
   border: 1px solid rgba(255, 255, 255, 0.7);
   border-radius: var(--r-lg);
-  padding: 18px;
+  padding: 20px;
   box-shadow: var(--shadow-card);
 }
 
 .byDomainTitle {
-  font-size: 11px;
+  font-size: 12.5px;
   color: var(--muted);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.3px;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
 }
 
 .byDomainRow {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 18px;
 }
 
 .byDomainLegend {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
 }
 
 .byDomainLegendItem {
-  font-size: 10.5px;
+  font-size: 12px;
   color: var(--ink-soft);
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
 }
 
 /* Left-rail mini calendar */
@@ -479,19 +479,19 @@
 }
 
 .rhythmTitle {
-  font-size: 11px;
+  font-size: 12.5px;
   color: var(--muted);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.3px;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 
 .rhythmBars {
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
-  height: 44px;
+  height: 52px;
   margin-bottom: 8px;
 }
 
@@ -504,37 +504,37 @@
 .rhythmDayLabels {
   display: flex;
   justify-content: space-between;
-  font-size: 8.5px;
+  font-size: 10px;
   color: var(--muted-2);
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 
 .rhythmNote {
-  font-size: 11.5px;
+  font-size: 13px;
   color: var(--ink-soft);
-  line-height: 1.4;
+  line-height: 1.45;
 }
 
 .energizerBar {
   display: flex;
-  height: 14px;
+  height: 16px;
   border-radius: var(--r-pill);
   overflow: hidden;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 
 .energizerLegend {
   display: flex;
   justify-content: space-between;
-  font-size: 10px;
+  font-size: 11.5px;
   color: var(--muted);
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 
 .energizerNote {
-  font-size: 10.5px;
+  font-size: 12px;
   color: var(--muted-2);
-  line-height: 1.4;
+  line-height: 1.45;
 }
 
 .viewArchived {
