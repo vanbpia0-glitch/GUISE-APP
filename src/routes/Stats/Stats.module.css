@@ -685,6 +685,15 @@
   aspect-ratio: 1;
   border-radius: 12px;
   background: rgba(41, 39, 35, 0.08);
+  position: relative;
+}
+
+.heatCellNum {
+  position: absolute;
+  top: 6px;
+  left: 8px;
+  font-size: 10px;
+  font-weight: 700;
 }
 
 .heatCellToday {

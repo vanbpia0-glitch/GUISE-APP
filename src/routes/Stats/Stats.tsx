@@ -653,11 +653,24 @@ export default function Stats() {
                     className={`${styles.heatCell} ${isSameDay(cell.date, now) ? styles.heatCellToday : ''}`}
                     style={{ background: heatColor(cell.hours) }}
                     title={`${cell.date.toDateString()}: ${cell.hours}h`}
-                  />
+                  >
+                    <span
+                      className={styles.heatCellNum}
+                      style={{ color: cell.hours >= 2.5 ? 'rgba(255,255,255,0.85)' : 'rgba(41,39,35,0.45)' }}
+                    >
+                      {cell.date.getDate() === 1 || i === 0
+                        ? cell.date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
+                        : cell.date.getDate()}
+                    </span>
+                  </div>
                 ))}
               </div>
               <div className={styles.heatFooter}>
-                <span>{consistency.activeDays} of {consistency.days.length} days active this month</span>
+                <span>
+                  {heat21[0].date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })} —{' '}
+                  {heat21[20].date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })} · {consistency.activeDays} of{' '}
+                  {consistency.days.length} days active this month
+                </span>
                 <span className={styles.heatFooterAccent}>Today outlined</span>
               </div>
             </div>
@@ -677,7 +690,8 @@ export default function Stats() {
               </div>
               <div>
                 <div className={styles.sideLabel}>Current active streak</div>
-                <div className={styles.sideValueSmall}>
+                <div className={styles.sideValueSmall} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  {activeStreakDays > 0 && <IconFlame size={22} color="var(--sc-base)" />}
                   {activeStreakDays > 0 ? `${activeStreakDays} day${activeStreakDays === 1 ? '' : 's'} running` : 'No active streak'}
                 </div>
               </div>
