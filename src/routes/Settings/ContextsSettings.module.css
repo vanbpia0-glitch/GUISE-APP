@@ -7,11 +7,11 @@
 
 .headerRow {
   display: grid;
-  grid-template-columns: 2fr 1fr;
+  grid-template-columns: 1fr 1fr;
   gap: 20px;
   max-width: 1400px;
   margin-bottom: 26px;
-  align-items: stretch;
+  align-items: center;
 }
 
 .title {
@@ -38,13 +38,9 @@
 }
 
 .overviewCard {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--r-2xl);
-  padding: 18px 20px;
-  box-shadow: var(--shadow-card);
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 14px;
 }
 
