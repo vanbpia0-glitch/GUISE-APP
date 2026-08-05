@@ -229,27 +229,28 @@
 }
 
 .vsAvgValue {
-  font-size: 26px;
+  font-size: 34px;
   font-weight: 800;
   color: var(--ink);
+  line-height: 1;
 }
 
 .vsAvgNote {
-  font-size: 9.5px;
+  font-size: 11px;
   color: var(--ink-soft);
-  margin-top: 3px;
+  margin-top: 6px;
 }
 
 .vsAvgBars {
   display: flex;
   align-items: flex-end;
-  gap: 6px;
-  height: 50px;
+  gap: 9px;
+  height: 76px;
 }
 
 .vsAvgBar {
-  width: 14px;
-  border-radius: 4px 4px 0 0;
+  width: 22px;
+  border-radius: 5px 5px 0 0;
 }
 
 .spark4Note {
@@ -258,19 +259,71 @@
   margin: 8px 0 4px;
 }
 
+.sparkTick {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  font-size: 9px;
+  color: var(--ink-soft);
+}
+
+.sparkTick strong {
+  font-weight: 700;
+}
+
+.sparkTick em {
+  font-style: normal;
+  font-size: 7.5px;
+  color: var(--muted-2);
+}
+
 .barChartWrap {
   position: relative;
   height: 160px;
+}
+
+.dayChart {
+  position: relative;
+  height: 168px;
+}
+
+.dayGrid {
+  position: absolute;
+  inset: 0 0 20px 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  pointer-events: none;
+}
+
+.dayGridRow {
+  position: relative;
+  border-top: 1px solid rgba(41, 39, 35, 0.07);
+}
+
+.dayGridLabel {
+  position: absolute;
+  top: -6px;
+  left: 0;
+  font-size: 8px;
+  color: var(--muted-2);
 }
 
 .dayBarsRow {
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
-  height: 160px;
+  height: 168px;
   padding-left: 24px;
   position: relative;
   z-index: 1;
+}
+
+.dayBarValue {
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--sc-mid);
 }
 
 .dayBarCol {
@@ -302,6 +355,8 @@
 
 .sessionsCard {
   background: rgba(255, 189, 26, 0.2);
+  display: flex;
+  flex-direction: column;
 }
 
 .sessionsTop {
@@ -311,34 +366,43 @@
 }
 
 .sessionsNote {
-  font-size: 10px;
+  font-size: 11.5px;
   color: var(--van-deep);
-  opacity: 0.75;
+  opacity: 0.8;
   text-align: right;
-  max-width: 110px;
+  max-width: 130px;
   line-height: 1.4;
 }
 
 .sessionsBig {
-  font-size: 30px;
+  font-size: 42px;
   font-weight: 800;
   color: var(--van-deep);
-  margin: 4px 0 2px;
+  margin: 8px 0 2px;
+  line-height: 1;
 }
 
 .sessionsSub {
-  font-size: 10px;
+  font-size: 12px;
   color: var(--van-deep);
   opacity: 0.75;
-  margin-bottom: 14px;
+}
+
+.sessionsLenLabel {
+  font-size: 10px;
+  color: var(--van-deep);
+  opacity: 0.7;
+  font-weight: 700;
+  margin-bottom: 8px;
+  margin-top: auto;
 }
 
 .histoBars {
   display: flex;
   align-items: flex-end;
-  gap: 5px;
-  height: 44px;
-  margin-bottom: 6px;
+  gap: 6px;
+  height: 60px;
+  margin-bottom: 8px;
 }
 
 .histoBar {
@@ -530,11 +594,47 @@
   font-weight: 600;
 }
 
+.contextBarDelta {
+  font-size: 9.5px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.contextSummary {
+  font-size: 10.5px;
+  color: var(--ink-soft);
+  border-top: 1px solid rgba(41, 39, 35, 0.08);
+  padding-top: 14px;
+  margin-top: 18px;
+}
+
 .consistencyHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 14px;
+}
+
+.consistencyHeaderRight {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.heatLegend {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 8.5px;
+  color: var(--ink-soft);
+}
+
+.heatLegendSwatch {
+  width: 9px;
+  height: 9px;
+  border-radius: 2px;
 }
 
 .consistencyTitle {

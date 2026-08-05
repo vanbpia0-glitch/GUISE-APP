@@ -98,7 +98,16 @@ export default function Stats() {
   const source = hoursBySourceType(state, weekStart, now);
   const contexts = activeContexts(state);
   const hoursByContext = hoursByContextThisWeek(state, viewingNow);
+  const hoursByContextPrev = hoursByContextThisWeek(state, addDays(viewingNow, -7));
   const maxContextHours = Math.max(0.5, ...contexts.map((c) => hoursByContext[c.id] || 0));
+  const totalContextHours = contexts.reduce((s, c) => s + (hoursByContext[c.id] || 0), 0);
+  const topContext = contexts
+    .map((c) => ({ c, hrs: hoursByContext[c.id] || 0 }))
+    .sort((a, b) => b.hrs - a.hrs)[0];
+  const contextSummary =
+    topContext && topContext.hrs > 0 && totalContextHours > 0
+      ? `${topContext.c.name} took ${Math.round((topContext.hrs / totalContextHours) * 100)}% of tracked hours this week.`
+      : 'No context hours tracked yet this week.';
 
   const records = personalRecords(state);
   const resolvedThisWeek = blockersResolvedThisWeek(state, viewingNow);
@@ -216,7 +225,7 @@ export default function Stats() {
                 Energy
               </span>
             </div>
-            <svg width="80" height="80" viewBox="0 0 80 80">
+            <svg width="120" height="120" viewBox="0 0 80 80">
               <circle cx="40" cy="40" r="32" fill="none" stroke="rgba(41,39,35,0.08)" strokeWidth="10" />
               {(() => {
                 const circ = 2 * Math.PI * 32;
@@ -264,39 +273,55 @@ export default function Stats() {
           <div className={styles.avgValue}>{betterThanPct}%</div>
           {(() => {
             const w = 160;
-            const h = 40;
+            const h = 56;
             const n = last8.length;
             const max = Math.max(1, ...last8);
             const pts = last8.map((m, i) => {
               const x = (i / (n - 1)) * w;
-              const y = h - 4 - (m / max) * (h - 10);
+              const y = h - 6 - (m / max) * (h - 16);
               return { x, y };
             });
             const line = pts.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(' ');
+            const area = `${line} L ${w} ${h} L 0 ${h} Z`;
             const last = pts[pts.length - 1];
             return (
               <svg width="100%" height={h} viewBox={`0 0 ${w} ${h}`} className={styles.betterSpark}>
-                <path d={line} fill="none" stroke="rgba(41,35,80,0.35)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-                <line x1={last.x} y1={last.y - 2} x2={last.x} y2={h - 4} stroke="var(--me-deep)" strokeWidth="2" />
-                <circle cx={last.x} cy={last.y} r="4" fill="var(--me-deep)" />
+                {[10, 28, 46].map((y) => (
+                  <line key={y} x1="0" y1={y} x2={w} y2={y} stroke="rgba(41,35,80,0.1)" strokeWidth="1" />
+                ))}
+                <path d={area} fill="var(--me-base)" opacity="0.14" />
+                <path d={line} fill="none" stroke="rgba(41,35,80,0.45)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                {pts.slice(0, -1).map((p, i) => (
+                  <circle key={i} cx={p.x} cy={p.y} r="2.5" fill="rgba(41,35,80,0.3)" />
+                ))}
+                <line x1={last.x} y1={last.y - 2} x2={last.x} y2={h - 6} stroke="var(--me-deep)" strokeWidth="2" />
+                <circle cx={last.x} cy={last.y} r="4.5" fill="var(--me-deep)" />
               </svg>
             );
           })()}
-          <div className={styles.avgNote}>You're the marked point on your own weekly curve</div>
+          <div className={styles.avgNote}>This week (marked) vs your last 8 weeks</div>
         </div>
 
         <div className={styles.card} style={{ gridColumn: 'span 3' }}>
-          <div className={styles.cardLabel}>Last 4 weeks</div>
+          <div className={styles.cardLabel}>Last 4 weeks · momentum</div>
           {(() => {
             const w = 160;
-            const h = 60;
-            const pts = last4.map((m, i) => ({ x: (i / 3) * w, y: h - 8 - (m / 100) * (h - 16), m }));
+            const h = 72;
+            const pts = last4.map((m, i) => ({ x: 10 + (i / 3) * (w - 14), y: h - 16 - (m / 100) * (h - 26), m }));
             const line = pts.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(' ');
-            const area = `${line} L ${w} ${h} L 0 ${h} Z`;
+            const area = `${line} L ${pts[3].x} ${h - 14} L ${pts[0].x} ${h - 14} Z`;
+            const rows = [
+              { pct: 100, y: h - 16 - (h - 26) },
+              { pct: 50, y: h - 16 - 0.5 * (h - 26) },
+              { pct: 0, y: h - 16 },
+            ];
             return (
               <svg width="100%" height={h} viewBox={`0 0 ${w} ${h}`}>
-                {[12, 30, 48].map((y) => (
-                  <line key={y} x1="0" y1={y} x2={w} y2={y} stroke="rgba(41,39,35,0.08)" strokeWidth="1" />
+                {rows.map((r) => (
+                  <g key={r.pct}>
+                    <line x1="10" y1={r.y} x2={w} y2={r.y} stroke="rgba(41,39,35,0.08)" strokeWidth="1" />
+                    <text x="0" y={r.y + 3} fontSize="6.5" fill="var(--muted-2)">{r.pct}</text>
+                  </g>
                 ))}
                 <path d={area} fill="var(--grounds-base)" opacity="0.12" />
                 <path d={line} fill="none" stroke="var(--grounds-base)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
@@ -306,13 +331,16 @@ export default function Stats() {
               </svg>
             );
           })()}
-          <div className={styles.spark4Note}>Best stretch in 4 weeks</div>
           <div className={styles.sparkLabels}>
-            {last4.map((m, i) => (
-              <span key={i} style={i === 3 ? { color: 'var(--grounds-mid)', fontWeight: 700 } : undefined}>
-                {m}%
-              </span>
-            ))}
+            {last4.map((m, i) => {
+              const end = addDays(weekStart, (i - 3) * 7 + 6);
+              return (
+                <span key={i} className={styles.sparkTick} style={i === 3 ? { color: 'var(--grounds-mid)' } : undefined}>
+                  <strong>{m}%</strong>
+                  <em>{i === 3 ? 'now' : end.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</em>
+                </span>
+              );
+            })}
           </div>
         </div>
 
@@ -343,23 +371,42 @@ export default function Stats() {
         <div className={styles.card} style={{ gridColumn: 'span 8' }}>
           <div className={styles.momentumRow} style={{ marginBottom: 14 }}>
             <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--ink)' }}>Focus hours by day</span>
-            <span style={{ fontSize: 10.5, color: 'var(--muted-2)' }}>{thisWeekHours}h total</span>
+            <span style={{ fontSize: 10.5, color: 'var(--muted-2)' }}>
+              {weekStart.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })} — {weekEnd.toLocaleDateString(undefined, { day: 'numeric' })} · {thisWeekHours}h total
+            </span>
           </div>
-          <div className={styles.dayBarsRow}>
-            {weekDays.map((day) => {
-              const blocks = blocksOnDay(state, day);
-              const minutes = blocks.reduce((s, b) => s + blockActualMinutes(state, b, now), 0);
-              // Cap the tallest bar at 82% so it never touches the card's top edge / total label.
-              const heightPct = Math.max(3, (minutes / maxDayMinutes) * 82);
-              const today_ = isSameDay(day, now);
-              return (
-                <div className={styles.dayBarCol} key={day.toISOString()}>
-                  <div className={styles.dayBar} style={{ height: `${heightPct}%`, background: minutes > 0 ? 'var(--sc-base)' : 'var(--van-tint)' }} />
-                  <span className={`${styles.dayBarLabel} ${today_ ? styles.dayBarLabelToday : ''}`}>{weekdayLabel(day)}</span>
+          {(() => {
+            const maxHours = Math.max(1, Math.ceil(maxDayMinutes / 60));
+            const gridLevels = Array.from({ length: maxHours }, (_, i) => maxHours - i); // top→bottom
+            return (
+              <div className={styles.dayChart}>
+                <div className={styles.dayGrid}>
+                  {gridLevels.map((hr) => (
+                    <div className={styles.dayGridRow} key={hr}>
+                      <span className={styles.dayGridLabel}>{hr}h</span>
+                    </div>
+                  ))}
                 </div>
-              );
-            })}
-          </div>
+                <div className={styles.dayBarsRow}>
+                  {weekDays.map((day) => {
+                    const blocks = blocksOnDay(state, day);
+                    const minutes = blocks.reduce((s, b) => s + blockActualMinutes(state, b, now), 0);
+                    const hrs = Math.round((minutes / 60) * 10) / 10;
+                    // Cap tallest at 82% so it never touches the top gridline / label.
+                    const heightPct = minutes === 0 ? 3 : Math.max(6, (minutes / maxDayMinutes) * 82);
+                    const today_ = isSameDay(day, now);
+                    return (
+                      <div className={styles.dayBarCol} key={day.toISOString()}>
+                        {minutes > 0 && <span className={styles.dayBarValue}>{hrs}h</span>}
+                        <div className={styles.dayBar} style={{ height: `${heightPct}%`, background: minutes > 0 ? 'var(--sc-base)' : 'var(--van-tint)' }} />
+                        <span className={`${styles.dayBarLabel} ${today_ ? styles.dayBarLabelToday : ''}`}>{weekdayLabel(day)}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })()}
         </div>
 
         <div className={`${styles.card} ${styles.sessionsCard}`} style={{ gridColumn: 'span 4' }}>
@@ -374,7 +421,7 @@ export default function Stats() {
           </div>
           <div className={styles.sessionsBig}>{sessions.length}</div>
           <div className={styles.sessionsSub}>avg {avgSessionMin}min each</div>
-          <div style={{ fontSize: 9, color: 'var(--van-deep)', opacity: 0.7, fontWeight: 700, marginBottom: 6 }}>Session length</div>
+          <div className={styles.sessionsLenLabel}>Session length</div>
           <div className={styles.histoBars}>
             {Object.entries(histogram).map(([label, count]) => (
               <div key={label} className={styles.histoBar} style={{ height: `${Math.max(6, (count / maxHisto) * 100)}%` }} />
@@ -509,12 +556,13 @@ export default function Stats() {
           </div>
         </div>
 
-        <div className={styles.card} style={{ gridColumn: 'span 4' }}>
-          <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--ink)', marginBottom: 28 }}>Hours by context</div>
+        <div className={styles.card} style={{ gridColumn: 'span 4', alignSelf: 'start' }}>
+          <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--ink)', marginBottom: 20 }}>Hours by context</div>
           <div className={styles.contextBarsWrap}>
             {contexts.map((c) => {
               const colors = colorsFor(c.color_key);
               const hrs = hoursByContext[c.id] || 0;
+              const delta = Math.round((hrs - (hoursByContextPrev[c.id] || 0)) * 10) / 10;
               return (
                 <div className={styles.contextBarCol} key={c.id}>
                   <span className={styles.contextBarValue} style={{ color: colors.deep }}>
@@ -527,28 +575,46 @@ export default function Stats() {
                   <span className={styles.contextBarLabel} style={{ color: colors.deep }}>
                     {c.name}
                   </span>
+                  <span
+                    className={styles.contextBarDelta}
+                    style={{ color: delta > 0 ? 'var(--grounds-mid)' : delta < 0 ? 'var(--sc-mid)' : 'var(--muted-2)' }}
+                  >
+                    {delta > 0 ? <IconArrowUp size={9} /> : delta < 0 ? <IconArrowDown size={9} /> : null}
+                    {delta === 0 ? 'flat' : Math.abs(delta)}
+                  </span>
                 </div>
               );
             })}
           </div>
+          <div className={styles.contextSummary}>{contextSummary}</div>
         </div>
 
         <div className={styles.card} style={{ gridColumn: 'span 8' }}>
           <div className={styles.consistencyHeader}>
             <span className={styles.consistencyTitle}>Monthly consistency</span>
-            <div className={styles.weekNav}>
-              <button className={styles.navBtn} onClick={() => setMonthOffset((m) => m - 1)} aria-label="Previous month">
-                <IconChevronLeft size={11} />
-              </button>
-              <span className={styles.navLabel}>{monthDate.toLocaleDateString(undefined, { month: 'long' })}</span>
-              <button
-                className={styles.navBtn}
-                onClick={() => setMonthOffset((m) => Math.min(0, m + 1))}
-                aria-label="Next month"
-                disabled={monthOffset === 0}
-              >
-                <IconChevronRight size={11} />
-              </button>
+            <div className={styles.consistencyHeaderRight}>
+              <div className={styles.weekNav}>
+                <button className={styles.navBtn} onClick={() => setMonthOffset((m) => m - 1)} aria-label="Previous month">
+                  <IconChevronLeft size={11} />
+                </button>
+                <span className={styles.navLabel}>{monthDate.toLocaleDateString(undefined, { month: 'long' })}</span>
+                <button
+                  className={styles.navBtn}
+                  onClick={() => setMonthOffset((m) => Math.min(0, m + 1))}
+                  aria-label="Next month"
+                  disabled={monthOffset === 0}
+                >
+                  <IconChevronRight size={11} />
+                </button>
+              </div>
+              <div className={styles.heatLegend}>
+                <span>Less</span>
+                <span className={styles.heatLegendSwatch} style={{ background: 'rgba(41,39,35,0.08)' }} />
+                <span className={styles.heatLegendSwatch} style={{ background: '#b4c48d' }} />
+                <span className={styles.heatLegendSwatch} style={{ background: '#7d944d' }} />
+                <span className={styles.heatLegendSwatch} style={{ background: '#5a6b38' }} />
+                <span>More</span>
+              </div>
             </div>
           </div>
           <div className={styles.consistencyBody}>
