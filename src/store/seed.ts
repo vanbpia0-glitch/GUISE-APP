@@ -24,10 +24,31 @@ function atTime(day: Date, hh: number, mm: number): Date {
 }
 
 /**
+ * Placeholder state used only while the Firestore-backed store is loading
+ * (before auth resolves and the initial fetch completes). Never rendered —
+ * StoreProvider gates children behind `ready`.
+ */
+export function emptyState(): AppState {
+  return {
+    profile: { name: '', role: '', photo: null },
+    contexts: {},
+    goals: {},
+    blockers: {},
+    blocks: {},
+    workSessions: {},
+    systems: {},
+    reflections: {},
+    targets: {},
+    targetLogEntries: {},
+    activeTimerBlockId: null,
+  };
+}
+
+/**
  * Builds a fresh starter dataset anchored to "now" so Today's blocks, this
  * week's completed hours, and target log dates all read as current. Only
- * used the very first time the app runs (see persistence.ts) — real data
- * always wins once it exists.
+ * used the very first time a user's Firestore data is empty (see
+ * store/persistence.ts) — real data always wins once it exists.
  */
 export function buildSeedState(): AppState {
   const now = new Date();
