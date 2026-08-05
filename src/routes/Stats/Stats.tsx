@@ -288,62 +288,66 @@ export default function Stats() {
           </div>
         </div>
 
-        <div className={`${styles.card} ${styles.avgCard}`} style={{ gridColumn: 'span 3' }}>
+        <div className={`${styles.card} ${styles.avgCard} ${styles.chartCard}`} style={{ gridColumn: 'span 3' }}>
           <div className={styles.avgLabel}>You're better than</div>
           <div className={styles.avgValue}>{betterThanPct}%</div>
-          {(() => {
-            const w = 320;
-            const h = 52;
-            const n = last8.length;
-            const max = Math.max(1, ...last8);
-            const pts = last8.map((m, i) => {
-              const x = (i / (n - 1)) * w;
-              const y = h - 6 - (m / max) * (h - 16);
-              return { x, y };
-            });
-            const line = pts.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(' ');
-            const area = `${line} L ${w} ${h} L 0 ${h} Z`;
-            const last = pts[pts.length - 1];
-            return (
-              <svg width="100%" height={h} viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none" className={styles.betterSpark}>
-                {[0.14, 0.5, 0.86].map((f) => (
-                  <line key={f} x1="0" y1={h * f} x2={w} y2={h * f} stroke="rgba(41,35,80,0.1)" strokeWidth="1" />
-                ))}
-                <path d={area} fill="var(--me-base)" opacity="0.14" />
-                <path d={line} fill="none" stroke="rgba(41,35,80,0.45)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-                {pts.slice(0, -1).map((p, i) => (
-                  <circle key={i} cx={p.x} cy={p.y} r="2.5" fill="rgba(41,35,80,0.3)" />
-                ))}
-                <line x1={last.x} y1={last.y - 2} x2={last.x} y2={h - 6} stroke="var(--me-deep)" strokeWidth="2" />
-                <circle cx={last.x} cy={last.y} r="4.5" fill="var(--me-deep)" />
-              </svg>
-            );
-          })()}
+          <div className={styles.chartFill}>
+            {(() => {
+              const w = 320;
+              const h = 100;
+              const n = last8.length;
+              const max = Math.max(1, ...last8);
+              const pts = last8.map((m, i) => {
+                const x = (i / (n - 1)) * w;
+                const y = h - 8 - (m / max) * (h - 20);
+                return { x, y };
+              });
+              const line = pts.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(' ');
+              const area = `${line} L ${w} ${h} L 0 ${h} Z`;
+              const last = pts[pts.length - 1];
+              return (
+                <svg viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none">
+                  {[0.14, 0.5, 0.86].map((f) => (
+                    <line key={f} x1="0" y1={h * f} x2={w} y2={h * f} stroke="rgba(41,35,80,0.1)" strokeWidth="1" />
+                  ))}
+                  <path d={area} fill="var(--me-base)" opacity="0.14" />
+                  <path d={line} fill="none" stroke="rgba(41,35,80,0.45)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                  {pts.slice(0, -1).map((p, i) => (
+                    <circle key={i} cx={p.x} cy={p.y} r="2.5" fill="rgba(41,35,80,0.3)" />
+                  ))}
+                  <line x1={last.x} y1={last.y - 2} x2={last.x} y2={h - 8} stroke="var(--me-deep)" strokeWidth="2" />
+                  <circle cx={last.x} cy={last.y} r="4.5" fill="var(--me-deep)" />
+                </svg>
+              );
+            })()}
+          </div>
           <div className={styles.avgNote}>This week (marked) vs your last 8 weeks</div>
         </div>
 
-        <div className={styles.card} style={{ gridColumn: 'span 3' }}>
+        <div className={`${styles.card} ${styles.chartCard}`} style={{ gridColumn: 'span 3' }}>
           <div className={styles.cardLabel}>Last 4 weeks · momentum</div>
-          {(() => {
-            const w = 320;
-            const h = 60;
-            const pts = last4.map((m, i) => ({ x: 16 + (i / 3) * (w - 24), y: h - 14 - (m / 100) * (h - 24), m }));
-            const line = pts.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(' ');
-            const area = `${line} L ${pts[3].x} ${h - 12} L ${pts[0].x} ${h - 12} Z`;
-            const rows = [h - 14 - (h - 24), h - 14 - 0.5 * (h - 24), h - 14];
-            return (
-              <svg width="100%" height={h} viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none">
-                {rows.map((y) => (
-                  <line key={y} x1="0" y1={y} x2={w} y2={y} stroke="rgba(41,39,35,0.08)" strokeWidth="1" />
-                ))}
-                <path d={area} fill="var(--grounds-base)" opacity="0.12" />
-                <path d={line} fill="none" stroke="var(--grounds-base)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-                {pts.map((p, i) => (
-                  <circle key={i} cx={p.x} cy={p.y} r={i === 3 ? 4.5 : 3} fill={i === 3 ? 'var(--grounds-base)' : 'var(--green-40)'} />
-                ))}
-              </svg>
-            );
-          })()}
+          <div className={styles.chartFill}>
+            {(() => {
+              const w = 320;
+              const h = 100;
+              const pts = last4.map((m, i) => ({ x: 16 + (i / 3) * (w - 24), y: h - 16 - (m / 100) * (h - 30), m }));
+              const line = pts.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(' ');
+              const area = `${line} L ${pts[3].x} ${h - 12} L ${pts[0].x} ${h - 12} Z`;
+              const rows = [h - 16 - (h - 30), h - 16 - 0.5 * (h - 30), h - 16];
+              return (
+                <svg viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none">
+                  {rows.map((y) => (
+                    <line key={y} x1="0" y1={y} x2={w} y2={y} stroke="rgba(41,39,35,0.08)" strokeWidth="1" />
+                  ))}
+                  <path d={area} fill="var(--grounds-base)" opacity="0.12" />
+                  <path d={line} fill="none" stroke="var(--grounds-base)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+                  {pts.map((p, i) => (
+                    <circle key={i} cx={p.x} cy={p.y} r={i === 3 ? 4.5 : 3} fill={i === 3 ? 'var(--grounds-base)' : 'var(--green-40)'} />
+                  ))}
+                </svg>
+              );
+            })()}
+          </div>
           <div className={styles.sparkLabels}>
             {last4.map((m, i) => {
               const end = addDays(weekStart, (i - 3) * 7 + 6);
@@ -357,7 +361,7 @@ export default function Stats() {
           </div>
         </div>
 
-        <div className={styles.card} style={{ gridColumn: 'span 3', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div className={styles.card} style={{ gridColumn: 'span 3', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
           <div>
             <div className={styles.cardLabel}>Vs your average</div>
             <div className={styles.vsAvgRow}>

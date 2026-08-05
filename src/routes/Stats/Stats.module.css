@@ -211,6 +211,23 @@
   margin-bottom: 6px;
 }
 
+.chartCard {
+  display: flex;
+  flex-direction: column;
+}
+
+.chartFill {
+  flex: 1;
+  min-height: 60px;
+  display: flex;
+  margin: 4px 0;
+}
+
+.chartFill svg {
+  width: 100%;
+  height: 100%;
+}
+
 .sparkNote {
   font-size: 9.5px;
   color: var(--ink-soft);
@@ -246,11 +263,11 @@
   display: flex;
   align-items: flex-end;
   gap: 12px;
-  height: 78px;
+  height: 130px;
 }
 
 .vsAvgBar {
-  width: 38px;
+  width: 40px;
   border-radius: 6px 6px 0 0;
 }
 
