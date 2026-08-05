@@ -142,10 +142,28 @@ export default function Stats() {
 
   const reflection = reflectionForWeek(state, weekStart);
 
-  const maxDayMinutes = Math.max(
-    60,
-    ...weekDays.map((d) => blocksOnDay(state, d).reduce((s, b) => s + blockActualMinutes(state, b, now), 0))
-  );
+  // Per-day focus data: total minutes + the dominant context that day (for coloring + icon).
+  const dayData = weekDays.map((day) => {
+    const blocks = blocksOnDay(state, day);
+    const minutes = blocks.reduce((s, b) => s + blockActualMinutes(state, b, now), 0);
+    const byCtx: Record<string, number> = {};
+    for (const b of blocks) {
+      if (!b.context_id) continue;
+      byCtx[b.context_id] = (byCtx[b.context_id] || 0) + blockActualMinutes(state, b, now);
+    }
+    let domCtxId: string | undefined;
+    let best = 0;
+    for (const [id, m] of Object.entries(byCtx)) {
+      if (m > best) {
+        best = m;
+        domCtxId = id;
+      }
+    }
+    return { day, minutes, hrs: Math.round((minutes / 60) * 10) / 10, ctx: domCtxId ? state.contexts[domCtxId] : undefined };
+  });
+  const maxDayMinutes = Math.max(60, ...dayData.map((d) => d.minutes));
+  const busiest = dayData.reduce((a, b) => (b.minutes > a.minutes ? b : a), dayData[0]);
+  const activeDayCount = dayData.filter((d) => d.minutes > 0).length;
 
   function heatColor(hours: number) {
     if (hours < 0) return 'transparent';
@@ -366,10 +384,11 @@ export default function Stats() {
             <div className={styles.cardLabel}>Vs your average</div>
             <div className={styles.vsAvgRow}>
               <span className={styles.vsAvgValue}>{vsAvgPct >= 0 ? '+' : ''}{vsAvgPct}%</span>
-              {vsAvgPct >= 0 ? <IconArrowUp size={13} color="var(--grounds-mid)" /> : <IconArrowDown size={13} color="var(--sc-mid)" />}
+              {vsAvgPct >= 0 ? <IconArrowUp size={18} color="var(--grounds-mid)" /> : <IconArrowDown size={18} color="var(--sc-mid)" />}
             </div>
-            <div className={styles.vsAvgNote}>
-              {vsAvgPct >= 0 ? 'Above' : 'Below'} typical week
+            <div className={styles.vsAvgNote}>{vsAvgPct >= 0 ? 'Above' : 'Below'} typical week</div>
+            <div className={styles.vsAvgDetail}>
+              <strong>{thisWeekHours}h</strong> this week · avg {avgHours}h
             </div>
           </div>
           {(() => {
@@ -377,9 +396,17 @@ export default function Stats() {
             const avgPct = Math.max(12, (avgHours / maxH) * 100);
             const weekPct = Math.max(12, (thisWeekHours / maxH) * 100);
             return (
-              <div className={styles.vsAvgBars}>
-                <div className={styles.vsAvgBar} style={{ height: `${avgPct}%`, background: 'rgba(41,39,35,0.15)' }} />
-                <div className={styles.vsAvgBar} style={{ height: `${weekPct}%`, background: 'var(--grounds-base)' }} />
+              <div className={styles.vsAvgBarsWrap}>
+                <div className={styles.vsAvgBars}>
+                  <div className={styles.vsAvgBarCol}>
+                    <div className={styles.vsAvgBar} style={{ height: `${avgPct}%`, background: 'rgba(41,39,35,0.15)' }} />
+                    <span className={styles.vsAvgBarLabel}>avg</span>
+                  </div>
+                  <div className={styles.vsAvgBarCol}>
+                    <div className={styles.vsAvgBar} style={{ height: `${weekPct}%`, background: 'var(--grounds-base)' }} />
+                    <span className={styles.vsAvgBarLabel} style={{ color: 'var(--grounds-mid)', fontWeight: 700 }}>wk</span>
+                  </div>
+                </div>
               </div>
             );
           })()}
@@ -394,7 +421,15 @@ export default function Stats() {
           </div>
           {(() => {
             const maxHours = Math.max(1, Math.ceil(maxDayMinutes / 60));
-            const gridLevels = Array.from({ length: maxHours }, (_, i) => maxHours - i); // top→bottom
+            const gridLevels = Array.from({ length: maxHours + 1 }, (_, i) => maxHours - i); // top→bottom incl 0
+            // Trend-line points: x = column centre (%), y = bar-top (%) within the plot.
+            const pts = dayData.map((d, i) => ({
+              x: ((i + 0.5) / 7) * 100,
+              y: 100 - (d.minutes === 0 ? 2 : Math.max(6, (d.minutes / maxDayMinutes) * 66)),
+              on: d.minutes > 0,
+            }));
+            const linePts = pts.filter((p) => p.on);
+            const linePath = linePts.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ');
             return (
               <div className={styles.dayChart}>
                 <div className={styles.dayGrid}>
@@ -404,18 +439,30 @@ export default function Stats() {
                     </div>
                   ))}
                 </div>
+                <svg className={styles.dayTrend} viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+                  {linePts.length >= 2 && (
+                    <path d={linePath} fill="none" stroke="var(--sc-mid)" strokeWidth="0.6" strokeDasharray="2 1.5" opacity="0.55" />
+                  )}
+                </svg>
                 <div className={styles.dayBarsRow}>
-                  {weekDays.map((day) => {
-                    const blocks = blocksOnDay(state, day);
-                    const minutes = blocks.reduce((s, b) => s + blockActualMinutes(state, b, now), 0);
-                    const hrs = Math.round((minutes / 60) * 10) / 10;
-                    // Cap tallest at 82% so it never touches the top gridline / label.
-                    const heightPct = minutes === 0 ? 3 : Math.max(6, (minutes / maxDayMinutes) * 82);
+                  {dayData.map(({ day, minutes, hrs, ctx }) => {
+                    const colors = ctx ? colorsFor(ctx.color_key) : undefined;
+                    const heightPct = minutes === 0 ? 2 : Math.max(6, (minutes / maxDayMinutes) * 66);
                     const today_ = isSameDay(day, now);
                     return (
                       <div className={styles.dayBarCol} key={day.toISOString()}>
-                        {minutes > 0 && <span className={styles.dayBarValue}>{hrs}h</span>}
-                        <div className={styles.dayBar} style={{ height: `${heightPct}%`, background: minutes > 0 ? 'var(--sc-base)' : 'var(--van-tint)' }} />
+                        {minutes > 0 && (
+                          <>
+                            <span className={styles.dayBarValue} style={{ color: colors?.mid }}>{hrs}h</span>
+                            <span className={styles.dayBarIcon} style={{ background: colors?.base }}>
+                              {ctx ? <ContextIcon name={ctx.icon} size={11} color="white" /> : null}
+                            </span>
+                          </>
+                        )}
+                        <div
+                          className={styles.dayBar}
+                          style={{ height: `${heightPct}%`, background: minutes > 0 ? colors?.base || 'var(--sc-base)' : 'var(--van-tint)' }}
+                        />
                         <span className={`${styles.dayBarLabel} ${today_ ? styles.dayBarLabelToday : ''}`}>{weekdayLabel(day)}</span>
                       </div>
                     );
@@ -424,6 +471,11 @@ export default function Stats() {
               </div>
             );
           })()}
+          <div className={styles.dayChartFoot}>
+            {activeDayCount === 0
+              ? 'No focus blocks logged this week yet.'
+              : `Busiest day ${weekdayLabel(busiest.day)} (${busiest.hrs}h) · ${activeDayCount} of 7 days active · bar colour = that day's main context`}
+          </div>
         </div>
 
         <div className={`${styles.card} ${styles.sessionsCard}`} style={{ gridColumn: 'span 4' }}>

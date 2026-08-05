@@ -8,7 +8,7 @@
 .header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   margin-bottom: 22px;
   flex-wrap: wrap;
   gap: 14px;
@@ -247,7 +247,7 @@
 }
 
 .vsAvgValue {
-  font-size: 44px;
+  font-size: 58px;
   font-weight: 800;
   color: var(--ink);
   line-height: 1;
@@ -259,6 +259,22 @@
   margin-top: 8px;
 }
 
+.vsAvgDetail {
+  font-size: 11px;
+  color: var(--muted-2);
+  margin-top: 6px;
+}
+
+.vsAvgDetail strong {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.vsAvgBarsWrap {
+  display: flex;
+  align-items: flex-end;
+}
+
 .vsAvgBars {
   display: flex;
   align-items: flex-end;
@@ -266,9 +282,23 @@
   height: 130px;
 }
 
+.vsAvgBarCol {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  height: 100%;
+}
+
 .vsAvgBar {
   width: 40px;
   border-radius: 6px 6px 0 0;
+}
+
+.vsAvgBarLabel {
+  font-size: 10px;
+  color: var(--muted-2);
 }
 
 .spark4Note {
@@ -338,10 +368,40 @@
   z-index: 1;
 }
 
+.dayTrend {
+  position: absolute;
+  left: 24px;
+  right: 0;
+  top: 0;
+  bottom: 20px;
+  width: calc(100% - 24px);
+  height: calc(100% - 20px);
+  z-index: 2;
+  pointer-events: none;
+}
+
 .dayBarValue {
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 700;
   color: var(--sc-mid);
+}
+
+.dayBarIcon {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.dayChartFoot {
+  font-size: 11px;
+  color: var(--ink-soft);
+  border-top: 1px solid rgba(41, 39, 35, 0.08);
+  padding-top: 12px;
+  margin-top: 14px;
 }
 
 .dayBarCol {
