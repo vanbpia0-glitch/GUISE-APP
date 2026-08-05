@@ -630,7 +630,7 @@ export default function Stats() {
             </div>
           </div>
           <div className={styles.consistencyBody}>
-            <div style={{ flexShrink: 0, width: 400, maxWidth: '100%' }}>
+            <div className={styles.heatmapWrap}>
               <div className={styles.heatmapWeekdayRow}>
                 {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((d, i) => (
                   <span className={styles.heatmapWeekday} key={i}>
