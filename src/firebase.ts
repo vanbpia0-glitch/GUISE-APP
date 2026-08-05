@@ -2,7 +2,12 @@
 // TypeScript build like every other module — Vite/tsc treat them identically.
 import { initializeApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
-import { getAuth, signInAnonymously, onAuthStateChanged } from 'firebase/auth';
+import {
+  getAuth,
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+} from 'firebase/auth';
 
 const firebaseConfig = {
   apiKey: 'AIzaSyCz6EJHRfpe1SEmah_S-RnbOK-rOSL5DZU',
@@ -17,4 +22,4 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
 export const auth = getAuth(app);
-export { signInAnonymously, onAuthStateChanged };
+export { onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword };

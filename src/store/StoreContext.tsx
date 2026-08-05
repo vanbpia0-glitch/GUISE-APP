@@ -3,7 +3,8 @@ import type { AppState } from '../types';
 import { reducer, type Action } from './reducer';
 import { loadState, saveState } from './persistence';
 import { emptyState } from './seed';
-import { auth, onAuthStateChanged, signInAnonymously } from '../firebase';
+import { auth, onAuthStateChanged } from '../firebase';
+import LoginScreen from '../components/LoginScreen';
 
 interface StoreValue {
   state: AppState;
@@ -15,19 +16,18 @@ const StoreCtx = createContext<StoreValue | null>(null);
 export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(reducer, undefined as unknown as AppState, emptyState);
   const [uid, setUid] = useState<string | null>(null);
+  const [authChecked, setAuthChecked] = useState(false);
   const [ready, setReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const prevStateRef = useRef<AppState | undefined>(undefined);
 
-  // Sign in anonymously (or pick up the existing session) so every read/write
-  // below can be scoped to /users/{uid}/... without a login screen.
+  // Same email/password account on every device resolves to the same uid,
+  // so every read/write below can be scoped to /users/{uid}/... regardless
+  // of which device signed in.
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        setUid(user.uid);
-      } else {
-        signInAnonymously(auth).catch((err) => setError(err.message));
-      }
+      setUid(user ? user.uid : null);
+      setAuthChecked(true);
     });
     return unsub;
   }, []);
@@ -66,6 +66,18 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         Couldn't connect to Firebase: {error}
       </div>
     );
+  }
+
+  if (!authChecked) {
+    return (
+      <div style={{ display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center', color: 'var(--ink)' }}>
+        Loading…
+      </div>
+    );
+  }
+
+  if (!uid) {
+    return <LoginScreen />;
   }
 
   if (!ready) {
