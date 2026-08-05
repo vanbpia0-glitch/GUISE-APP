@@ -3,13 +3,23 @@
   display: flex;
   overflow: hidden;
   height: 100%;
+  background: #fff;
 }
 
 .main {
   flex: 1;
-  padding: 26px 32px;
+  padding: 26px 32px 24px;
   overflow-y: auto;
-  background: var(--canvas-bg);
+  background: #fff;
+}
+
+.main::-webkit-scrollbar,
+.sidebar::-webkit-scrollbar {
+  display: none;
+}
+.main,
+.sidebar {
+  scrollbar-width: none;
 }
 
 .header {
