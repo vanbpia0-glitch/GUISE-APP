@@ -72,7 +72,7 @@
 
 .achievementsGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 12px;
 }
 
@@ -81,6 +81,11 @@
   border-radius: var(--r-md);
   padding: 16px 8px;
   text-align: center;
+}
+
+.achievementLocked {
+  background: rgba(255, 255, 255, 0.05);
+  opacity: 0.5;
 }
 
 .achievementIcon {
@@ -93,9 +98,27 @@
   margin: 0 auto 8px;
 }
 
+.achievementIconLocked {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: transparent;
+  border: 1.5px dashed var(--muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 8px;
+}
+
 .achievementLabel {
   font-size: 11px;
   font-weight: 600;
+}
+
+.achievementLabelLocked {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted-2);
 }
 
 .emptyAchievements {
@@ -214,6 +237,24 @@
   font-weight: 700;
 }
 
+.priRing {
+  position: relative;
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.priRingIcon {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .goalCardBody {
   flex: 1;
   min-width: 0;
@@ -265,25 +306,23 @@
   border-radius: var(--r-sm);
 }
 
+.timelineRows {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
 .timelineRow {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-bottom: 10px;
 }
 
-.timelineRow:last-child {
-  margin-bottom: 0;
-}
-
-.timelineGoalLabel {
+.timelineMonth {
   font-size: 10px;
-  color: var(--faint);
-  width: 100px;
+  color: var(--muted-2);
+  width: 32px;
   flex-shrink: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .timelineTrack {
@@ -291,14 +330,14 @@
   height: 20px;
   position: relative;
   background: rgba(255, 255, 255, 0.08);
-  border-radius: var(--r-pill);
+  border-radius: 5px;
 }
 
 .timelineBar {
   position: absolute;
   top: 0;
   height: 100%;
-  border-radius: var(--r-pill);
+  border-radius: 5px;
   display: flex;
   align-items: center;
   padding-left: 8px;
@@ -316,7 +355,7 @@
 
 /* Right sidebar */
 .sidebar {
-  width: 300px;
+  width: 344px;
   flex-shrink: 0;
   border-left: 1px solid var(--border);
   padding: 26px 24px;

@@ -29,7 +29,20 @@ import {
 } from '../../lib/selectors';
 import { quarterDateRange, quarterLabel } from '../../lib/date';
 import { colorsFor } from '../../lib/contextColors';
-import { IconArrowsSort, IconFlag, IconFlame, IconGripVertical, IconPlus, IconTrophy } from '../../lib/icons';
+import {
+  ContextIcon,
+  IconArrowsSort,
+  IconBriefcase,
+  IconChevronRight,
+  IconFlag,
+  IconFlame,
+  IconGripVertical,
+  IconHeart,
+  IconLock,
+  IconPlus,
+  IconTrophy,
+  IconUserStar,
+} from '../../lib/icons';
 import Modal from '../../components/Modal';
 import AddGoalForm from '../../components/AddGoalForm';
 import AddBlockerForm from '../../components/AddBlockerForm';
@@ -90,27 +103,60 @@ export default function GoalsList() {
     dispatch({ type: 'REORDER_GOALS', payload: { orderedIds: reordered } });
   }
 
-  const achievements: { icon: JSX.Element; label: string; bg: string }[] = [];
-  if (streak >= 2)
-    achievements.push({ icon: <IconFlame size={17} color="white" />, label: `${streak}-day streak`, bg: 'var(--grounds-base)' });
-  if (completedThisWeek > 0)
-    achievements.push({
-      icon: <span style={{ color: 'white', fontWeight: 700 }}>{completedThisWeek}</span>,
-      label: `blocks done this wk`,
-      bg: 'var(--sc-base)',
-    });
-  if (resolvedThisWeek > 0)
-    achievements.push({
-      icon: <IconFlag size={15} color="white" />,
-      label: `${resolvedThisWeek} blocker${resolvedThisWeek > 1 ? 's' : ''} resolved`,
-      bg: 'var(--me-base)',
-    });
   const bestGoal = quarterGoals
     .map((g) => ({ g, pct: goalProgressPct(state, g) }))
     .filter((x) => x.pct >= 75)
     .sort((a, b) => b.pct - a.pct)[0];
-  if (bestGoal)
-    achievements.push({ icon: <IconTrophy size={15} color="var(--ink)" />, label: `${bestGoal.g.title} at ${bestGoal.pct}%`, bg: 'var(--van-base)' });
+  const short = (s: string, n = 14) => (s.length > n ? s.slice(0, n - 1) + '…' : s);
+
+  // Six fixed achievement slots — each either unlocked (colored icon) or locked
+  // (dashed lock). Matches the "N of 6" reference layout.
+  const achievements: { unlocked: boolean; icon: JSX.Element; bg: string; label: string }[] = [
+    {
+      unlocked: streak >= 2,
+      icon: <IconFlame size={17} color="white" />,
+      bg: 'var(--grounds-base)',
+      label: streak >= 2 ? `${streak}-day streak` : 'Build a streak',
+    },
+    {
+      unlocked: completedThisWeek > 0,
+      icon: <IconBriefcase size={16} color="white" />,
+      bg: 'var(--sc-base)',
+      label: completedThisWeek > 0 ? `${completedThisWeek} block${completedThisWeek > 1 ? 's' : ''} done` : 'Ship a block',
+    },
+    {
+      unlocked: resolvedThisWeek > 0,
+      icon: <IconHeart size={16} color="white" />,
+      bg: 'var(--me-base)',
+      label: resolvedThisWeek > 0 ? `${resolvedThisWeek} blocker${resolvedThisWeek > 1 ? 's' : ''} cleared` : 'Clear a blocker',
+    },
+    {
+      unlocked: !!bestGoal,
+      icon: <IconUserStar size={16} color="var(--ink)" />,
+      bg: 'var(--van-base)',
+      label: bestGoal ? `${short(bestGoal.g.title)} · ${bestGoal.pct}%` : 'Goal at 75%',
+    },
+    {
+      unlocked: qp.avgProgress >= 50,
+      icon: <IconFlag size={15} color="white" />,
+      bg: 'var(--sc-mid)',
+      label: qp.avgProgress >= 50 ? 'Quarter halfway' : 'Halfway there',
+    },
+    {
+      unlocked: quarterGoals.length > 0 && qp.needAttention === 0,
+      icon: <IconTrophy size={16} color="white" />,
+      bg: 'var(--grounds-mid)',
+      label: 'All on track',
+    },
+  ];
+  const achievementsUnlocked = achievements.filter((a) => a.unlocked).length;
+
+  // Two-colour quarter ring: green arc = goals on track, coral arc = goals
+  // needing attention, split across the circumference by their counts.
+  const RING_C = 2 * Math.PI * 66;
+  const ringTotal = qp.onTrack + qp.needAttention;
+  const ringGreen = ringTotal > 0 ? (qp.onTrack / ringTotal) * RING_C : 0;
+  const ringCoral = ringTotal > 0 ? (qp.needAttention / ringTotal) * RING_C : 0;
 
   function timelineBar(goal: Goal) {
     const { start, end } = quarterDateRange(goal.quarter);
@@ -124,9 +170,33 @@ export default function GoalsList() {
     const minT = Math.min(...times);
     const maxT = Math.max(...times);
     const leftPct = ((minT - start.getTime()) / totalMs) * 100;
-    const widthPct = Math.max(4, ((maxT - minT) / totalMs) * 100);
+    const widthPct = Math.max(18, ((maxT - minT) / totalMs) * 100);
     return { leftPct, widthPct };
   }
+
+  // Build a 3-row month roadmap for the quarter. Each goal with scheduled Blocks
+  // is placed on the month-row where its span begins (bumped to the next free
+  // row on collision), giving a clean Jul / Aug / Sep timeline like the inspo.
+  type TimelineEntry = { g: Goal; bar: { leftPct: number; widthPct: number } };
+  const { start: qStart } = quarterDateRange(currentQuarter);
+  const quarterMonths = [0, 1, 2].map((i) => {
+    const d = new Date(qStart);
+    d.setMonth(qStart.getMonth() + i);
+    return d.toLocaleString('en-US', { month: 'short' });
+  });
+  const timelineRows: (TimelineEntry | null)[] = [null, null, null];
+  quarterGoals.forEach((g) => {
+    const bar = timelineBar(g);
+    if (!bar) return;
+    let idx = Math.min(2, Math.floor(bar.leftPct / (100 / 3)));
+    if (timelineRows[idx]) {
+      const free = [0, 1, 2].find((i) => !timelineRows[i]);
+      if (free === undefined) return;
+      idx = free;
+    }
+    timelineRows[idx] = { g, bar };
+  });
+  const hasTimeline = timelineRows.some((r) => r);
 
   return (
     <div className={styles.page}>
@@ -144,23 +214,27 @@ export default function GoalsList() {
         <div className={styles.darkCard}>
           <div className={styles.darkCardHeader}>
             <span className={styles.darkCardTitle}>Achievements this week</span>
+            <span className={styles.darkCardMeta}>{achievementsUnlocked} of 6</span>
           </div>
-          {achievements.length > 0 ? (
-            <div className={styles.achievementsGrid}>
-              {achievements.slice(0, 6).map((a, i) => (
+          <div className={styles.achievementsGrid}>
+            {achievements.map((a, i) =>
+              a.unlocked ? (
                 <div className={styles.achievementTile} key={i}>
                   <div className={styles.achievementIcon} style={{ background: a.bg }}>
                     {a.icon}
                   </div>
                   <div className={styles.achievementLabel}>{a.label}</div>
                 </div>
-              ))}
-            </div>
-          ) : (
-            <div className={styles.emptyAchievements}>
-              Good — nothing to show yet this week. Get a block done and it'll show up here.
-            </div>
-          )}
+              ) : (
+                <div className={`${styles.achievementTile} ${styles.achievementLocked}`} key={i}>
+                  <div className={styles.achievementIconLocked}>
+                    <IconLock size={14} color="var(--muted-2)" />
+                  </div>
+                  <div className={styles.achievementLabelLocked}>{a.label}</div>
+                </div>
+              )
+            )}
+          </div>
         </div>
 
         <div className={styles.statsTrio}>
@@ -222,34 +296,47 @@ export default function GoalsList() {
             <span className={styles.priorityLabel} style={{ color: 'var(--faint)' }}>
               Timeline this quarter
             </span>
+            <span className={styles.darkCardMeta}>
+              {quarterMonths[0]} — {quarterMonths[2]}
+            </span>
           </div>
-          <div>
-            {quarterGoals.map((g) => {
-              const bar = timelineBar(g);
-              const ctx = state.contexts[g.context_id];
-              const colors = ctx ? colorsFor(ctx.color_key) : undefined;
-              return (
-                <div className={styles.timelineRow} key={g.id}>
-                  <span className={styles.timelineGoalLabel}>{g.title}</span>
-                  <div className={styles.timelineTrack}>
-                    {bar && (
-                      <div
-                        className={styles.timelineBar}
-                        style={{ left: `${bar.leftPct}%`, width: `${bar.widthPct}%`, background: colors?.base }}
-                      >
-                        <span className={styles.timelineBarLabel}>{g.title}</span>
-                      </div>
-                    )}
+          {hasTimeline ? (
+            <div className={styles.timelineRows}>
+              {timelineRows.map((entry, i) => {
+                const ctx = entry ? state.contexts[entry.g.context_id] : undefined;
+                const colors = ctx ? colorsFor(ctx.color_key) : undefined;
+                const light = colors?.base === 'var(--van-base)' || colors?.base === 'var(--grounds-base)';
+                return (
+                  <div className={styles.timelineRow} key={i}>
+                    <span className={styles.timelineMonth}>{quarterMonths[i]}</span>
+                    <div className={styles.timelineTrack}>
+                      {entry && (
+                        <div
+                          className={styles.timelineBar}
+                          style={{
+                            left: `${entry.bar.leftPct}%`,
+                            width: `${entry.bar.widthPct}%`,
+                            background: colors?.base,
+                          }}
+                        >
+                          <span
+                            className={styles.timelineBarLabel}
+                            style={{ color: light ? 'var(--ink)' : 'white' }}
+                          >
+                            {entry.g.title}
+                          </span>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
-              );
-            })}
-            {quarterGoals.every((g) => !timelineBar(g)) && (
-              <div className={styles.emptyAchievements}>
-                No Blocks scheduled against these goals yet — the timeline fills in once you do.
-              </div>
-            )}
-          </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div className={styles.emptyAchievements}>
+              No Blocks scheduled against these goals yet — the timeline fills in once you do.
+            </div>
+          )}
         </div>
       </div>
 
@@ -264,22 +351,38 @@ export default function GoalsList() {
           <div className={styles.quarterRingWrap}>
             <svg width="150" height="150" viewBox="0 0 160 160">
               <circle cx="80" cy="80" r="66" fill="none" stroke="var(--surface-tint)" strokeWidth="15" />
-              <circle
-                cx="80"
-                cy="80"
-                r="66"
-                fill="none"
-                stroke="var(--grounds-base)"
-                strokeWidth="15"
-                strokeDasharray={`${(qp.avgProgress / 100) * 2 * Math.PI * 66} ${2 * Math.PI * 66}`}
-                strokeLinecap="round"
-                transform="rotate(-90 80 80)"
-              />
+              {ringGreen > 0 && (
+                <circle
+                  cx="80"
+                  cy="80"
+                  r="66"
+                  fill="none"
+                  stroke="var(--grounds-base)"
+                  strokeWidth="15"
+                  strokeDasharray={`${ringGreen} ${RING_C}`}
+                  strokeLinecap="round"
+                  transform="rotate(-90 80 80)"
+                />
+              )}
+              {ringCoral > 0 && (
+                <circle
+                  cx="80"
+                  cy="80"
+                  r="66"
+                  fill="none"
+                  stroke="#F0997B"
+                  strokeWidth="15"
+                  strokeDasharray={`${ringCoral} ${RING_C}`}
+                  strokeDashoffset={-ringGreen}
+                  strokeLinecap="round"
+                  transform="rotate(-90 80 80)"
+                />
+              )}
               <text x="80" y="76" textAnchor="middle" fontSize="30" fontWeight="700" fill="var(--ink)">
                 {qp.avgProgress}%
               </text>
               <text x="80" y="98" textAnchor="middle" fontSize="11" fill="var(--muted-2)">
-                avg progress
+                {qp.needAttention === 0 ? 'on pace' : 'avg progress'}
               </text>
             </svg>
           </div>
@@ -288,8 +391,8 @@ export default function GoalsList() {
               <span className={styles.legendDot} style={{ background: 'var(--grounds-base)' }} />
               {qp.onTrack} on track
             </span>
-            <span className={styles.legendItem} style={{ color: 'var(--sc-mid)' }}>
-              <span className={styles.legendDot} style={{ background: 'var(--sc-mid)' }} />
+            <span className={styles.legendItem} style={{ color: '#AA5500' }}>
+              <span className={styles.legendDot} style={{ background: '#F0997B' }} />
               {qp.needAttention} need attention
             </span>
           </div>
@@ -425,7 +528,14 @@ function SortableGoalCard({ goal, rank, onOpen }: { goal: Goal; rank: number; on
   const colors = ctx ? colorsFor(ctx.color_key) : undefined;
   const pct = goalProgressPct(state, goal);
   const label = goalStatusLabel(state, goal);
-  const hasBlockers = openBlockersForGoal(state, goal.id).length > 0;
+  const openB = openBlockersForGoal(state, goal.id).length;
+  const hasBlockers = openB > 0;
+  const detail =
+    openB > 0
+      ? `${pct}% there, ${openB} blocker${openB > 1 ? 's' : ''}`
+      : pct === 0
+        ? 'Just started'
+        : `${pct}% there, ${label.toLowerCase()}`;
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -458,29 +568,37 @@ function SortableGoalCard({ goal, rank, onOpen }: { goal: Goal; rank: number; on
         <div className={styles.rankBadge} style={{ color: colors?.mid }}>
           {rank}
         </div>
-        <svg width="34" height="34" viewBox="0 0 38 38" style={{ flexShrink: 0 }}>
-          <circle cx="19" cy="19" r="16" fill="white" />
-          <circle
-            cx="19"
-            cy="19"
-            r="16"
-            fill="none"
-            stroke={colors?.base}
-            strokeWidth="4"
-            strokeDasharray={`${(pct / 100) * 100.5} 100.5`}
-            strokeLinecap="round"
-            transform="rotate(-90 19 19)"
-          />
-        </svg>
+        <div className={styles.priRing}>
+          <svg width="34" height="34" viewBox="0 0 38 38">
+            <circle cx="19" cy="19" r="16" fill="white" />
+            <circle
+              cx="19"
+              cy="19"
+              r="16"
+              fill="none"
+              stroke={colors?.base}
+              strokeWidth="4"
+              strokeDasharray={`${(pct / 100) * 100.5} 100.5`}
+              strokeLinecap="round"
+              transform="rotate(-90 19 19)"
+            />
+          </svg>
+          {ctx && (
+            <span className={styles.priRingIcon}>
+              <ContextIcon name={ctx.icon} size={13} color={colors?.base} />
+            </span>
+          )}
+        </div>
         <div className={styles.goalCardBody}>
           <div className={styles.goalCardTitle} style={{ color: colors?.deep }}>
             {goal.title}
           </div>
           <div className={styles.goalCardStatus} style={{ color: colors?.mid }}>
-            {label}
+            {detail}
           </div>
         </div>
         {hasBlockers && <span className={styles.blockerDot} />}
+        <IconChevronRight size={14} color={colors?.mid || 'var(--muted-2)'} style={{ flexShrink: 0 }} />
       </button>
     </div>
   );
