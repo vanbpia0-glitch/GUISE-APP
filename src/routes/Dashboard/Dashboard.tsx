@@ -21,7 +21,6 @@ import {
   ContextIcon,
   IconArrowRight,
   IconBell,
-  IconCamera,
   IconClock,
   IconEdit,
   IconPlayerPlay,
@@ -39,6 +38,7 @@ import Modal from '../../components/Modal';
 import AddGoalForm from '../../components/AddGoalForm';
 import AddBlockForm from '../../components/AddBlockForm';
 import AddSystemForm from '../../components/AddSystemForm';
+import EditProfileForm from '../../components/EditProfileForm';
 
 export default function Dashboard() {
   const { state, dispatch } = useStore();
@@ -53,9 +53,25 @@ export default function Dashboard() {
   const activeSystems = Object.values(state.systems).filter((s) => s.active);
   const weekRef = useRef<HTMLDivElement>(null);
 
+  const profile = state.profile;
   const [quickAddOpen, setQuickAddOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
+  const [editProfileOpen, setEditProfileOpen] = useState(false);
   const [addModalKind, setAddModalKind] = useState<null | 'goal' | 'block' | 'system'>(null);
+  const avatarFileRef = useRef<HTMLInputElement>(null);
+
+  function onAvatarFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === 'string') {
+        dispatch({ type: 'UPDATE_PROFILE', payload: { patch: { photo: reader.result } } });
+      }
+    };
+    reader.readAsDataURL(file);
+    e.target.value = '';
+  }
   const quickAddRef = useRef<HTMLDivElement>(null);
   const notifRef = useRef<HTMLDivElement>(null);
   useClickOutside(quickAddRef, quickAddOpen, () => setQuickAddOpen(false));
@@ -133,7 +149,9 @@ export default function Dashboard() {
         <div className={styles.header}>
           <div>
             <div className={styles.headerDate}>{formatDateLong(now)}</div>
-            <div className={styles.headerGreeting}>{greeting}</div>
+            <div className={styles.headerGreeting}>
+              {greeting}, {profile.name}
+            </div>
           </div>
           <div className={styles.headerActions}>
             <div className={styles.searchWrap}>
@@ -229,19 +247,19 @@ export default function Dashboard() {
             return (
               <div key={ctx.id} className={styles.contextCard} style={{ background: colors.tint }}>
                 <div className={styles.contextIconBox}>
-                  <div className={styles.contextIconLabel} style={{ color: colors.mid }}>
-                    {ctx.name}
-                  </div>
-                  <ContextIcon name={ctx.icon} size={16} color={colors.mid} />
+                  <ContextIcon name={ctx.icon} size={18} color={colors.mid} />
                 </div>
                 <div className={styles.contextBody}>
                   <div className={styles.contextTopRow}>
-                    <span className={styles.contextStatus} style={{ color: colors.deep }}>
-                      {label}
+                    <span className={styles.contextName} style={{ color: colors.deep }}>
+                      {ctx.name}
                     </span>
                     <span className={styles.contextPct} style={{ color: colors.mid }}>
                       {pct}%
                     </span>
+                  </div>
+                  <div className={styles.contextStatus} style={{ color: colors.mid }}>
+                    {label}
                   </div>
                   <div className={styles.barTrack} style={{ background: colors.track }}>
                     <div className={styles.barFill} style={{ width: `${pct}%`, background: colors.base }} />
@@ -550,13 +568,28 @@ export default function Dashboard() {
         </svg>
         <div className={styles.railInner}>
           <div className={styles.profileCard}>
-            <button className={styles.cameraBtn} aria-label="Change photo" title="Change photo">
-              <IconCamera size={12} color="white" />
+            <button
+              className={styles.avatar}
+              onClick={() => avatarFileRef.current?.click()}
+              aria-label="Change photo"
+              title="Change photo"
+            >
+              {profile.photo ? (
+                <img src={profile.photo} alt="" className={styles.avatarImg} />
+              ) : (
+                (profile.name.trim()[0] || 'V').toUpperCase()
+              )}
             </button>
-            <div className={styles.avatar}>G</div>
-            <div className={styles.profileName}>{greeting.split(' ')[1] === 'morning' ? 'Welcome back' : 'Welcome back'}</div>
-            <div className={styles.profileRole}>{contexts[0]?.role_description || 'Your day, at a glance'}</div>
-            <button className={styles.editProfileBtn}>
+            <input
+              ref={avatarFileRef}
+              type="file"
+              accept="image/*"
+              onChange={onAvatarFile}
+              style={{ display: 'none' }}
+            />
+            <div className={styles.profileName}>{profile.name}</div>
+            <div className={styles.profileRole}>{profile.role || 'Your day, at a glance'}</div>
+            <button className={styles.editProfileBtn} onClick={() => setEditProfileOpen(true)}>
               <IconEdit size={10} /> Edit Profile
             </button>
           </div>
@@ -693,6 +726,11 @@ export default function Dashboard() {
       {addModalKind === 'system' && (
         <Modal title="Add a system" onClose={() => setAddModalKind(null)}>
           <AddSystemForm onDone={() => setAddModalKind(null)} />
+        </Modal>
+      )}
+      {editProfileOpen && (
+        <Modal title="Edit profile" onClose={() => setEditProfileOpen(false)}>
+          <EditProfileForm onDone={() => setEditProfileOpen(false)} />
         </Modal>
       )}
     </div>

@@ -1,12 +1,19 @@
 import type { AppState } from '../types';
 import { buildSeedState } from './seed';
 
-const STORAGE_KEY = 'guise-state-v3';
+const STORAGE_KEY = 'guise-state-v4';
 
 export function loadState(): AppState {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) return JSON.parse(raw) as AppState;
+    if (raw) {
+      const parsed = JSON.parse(raw) as AppState;
+      // Guard against states persisted before the profile field existed.
+      if (!parsed.profile) {
+        parsed.profile = { name: 'Van', role: 'Head of Creatives, SC', photo: null };
+      }
+      return parsed;
+    }
   } catch {
     // fall through to seed
   }

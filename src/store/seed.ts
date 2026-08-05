@@ -692,6 +692,7 @@ export function buildSeedState(): AppState {
   ];
 
   const state: AppState = {
+    profile: { name: 'Van', role: 'Head of Creatives, SC', photo: null },
     contexts: Object.fromEntries(contexts.map((c) => [c.id, c])),
     goals: Object.fromEntries(goals.map((g) => [g.id, g])),
     blockers: Object.fromEntries(blockers.map((b) => [b.id, b])),

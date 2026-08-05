@@ -3,13 +3,21 @@
   display: flex;
   overflow: hidden;
   height: 100%;
+  background: #fff;
 }
 
 .main {
   flex: 1;
   padding: 26px 32px;
   overflow-y: auto;
-  background: var(--canvas-bg);
+  background: #fff;
+}
+
+.main::-webkit-scrollbar {
+  display: none;
+}
+.main {
+  scrollbar-width: none;
 }
 
 .header {
@@ -173,16 +181,14 @@
 }
 
 .contextIconBox {
+  width: 44px;
+  height: 44px;
   background: white;
-  border-radius: var(--r-sm);
-  padding: 8px 10px;
-  text-align: center;
+  border-radius: var(--r-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
-}
-
-.contextIconLabel {
-  font-size: 9px;
-  margin-bottom: 2px;
 }
 
 .contextBody {
@@ -193,24 +199,30 @@
 .contextTopRow {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 6px;
+  align-items: baseline;
+  margin-bottom: 2px;
   gap: 8px;
 }
 
-.contextStatus {
-  font-size: 12px;
+.contextName {
+  font-size: 14px;
   font-weight: 700;
 }
 
-.contextPct {
+.contextStatus {
   font-size: 11px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.contextPct {
+  font-size: 12px;
   font-weight: 700;
   flex-shrink: 0;
 }
 
 .barTrack {
-  height: 5px;
+  height: 8px;
   border-radius: var(--r-pill);
   overflow: hidden;
   background: rgba(0, 0, 0, 0.08);
@@ -528,7 +540,7 @@
 
 /* Right rail */
 .rightRail {
-  width: 300px;
+  width: 344px;
   flex-shrink: 0;
   border-left: 1px solid var(--border);
   position: relative;
@@ -569,32 +581,29 @@
   position: relative;
 }
 
-.cameraBtn {
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  background: rgba(41, 39, 35, 0.35);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-left: auto;
-  margin-bottom: 10px;
-  border: none;
-}
-
 .avatar {
-  width: 52px;
-  height: 52px;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
   background: var(--sc-base);
   display: flex;
   align-items: center;
   justify-content: center;
   margin: 0 auto 8px;
-  font-size: 19px;
+  font-size: 22px;
   font-weight: 700;
   color: white;
   border: 3px solid white;
+  padding: 0;
+  overflow: hidden;
+  cursor: pointer;
+  box-shadow: var(--k-shadow-sm);
+}
+
+.avatarImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .profileName {

@@ -67,7 +67,8 @@ export type Action =
       type: 'ADD_TARGET';
       payload: Omit<Target, 'id' | 'created_at' | 'current_amount' | 'status'>;
     }
-  | { type: 'LOG_TARGET_MANUAL'; payload: { target_id: string; amount: number } };
+  | { type: 'LOG_TARGET_MANUAL'; payload: { target_id: string; amount: number } }
+  | { type: 'UPDATE_PROFILE'; payload: { patch: Partial<import('../types').Profile> } };
 
 function nowIso(): string {
   return new Date().toISOString();
@@ -418,6 +419,10 @@ export function reducer(state: AppState, action: Action): AppState {
         targets: { ...state.targets, [updated.id]: updated },
         targetLogEntries: { ...state.targetLogEntries, [logId]: entry },
       };
+    }
+
+    case 'UPDATE_PROFILE': {
+      return { ...state, profile: { ...state.profile, ...action.payload.patch } };
     }
 
     default:

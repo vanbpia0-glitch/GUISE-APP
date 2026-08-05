@@ -129,7 +129,15 @@ export interface TargetLogEntry {
   block_id?: ID;
 }
 
+export interface Profile {
+  name: string;
+  role: string;
+  /** Data URL of an uploaded avatar photo, or null to fall back to the initial. */
+  photo: string | null;
+}
+
 export interface AppState {
+  profile: Profile;
   contexts: Record<ID, GuiseContext>;
   goals: Record<ID, Goal>;
   blockers: Record<ID, Blocker>;
