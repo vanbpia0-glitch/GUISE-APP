@@ -64,7 +64,7 @@ export default function ContextsSettings() {
           </div>
         </div>
         <div className={styles.overviewCard}>
-          <svg width="72" height="52" viewBox="0 0 140 90">
+          <svg width="118" height="76" viewBox="0 0 140 90">
             <defs>
               <linearGradient id="hatsRingGrad" x1="0" y1="0" x2="1" y2="0">
                 <stop offset="0%" stopColor="var(--grounds-base)" />
