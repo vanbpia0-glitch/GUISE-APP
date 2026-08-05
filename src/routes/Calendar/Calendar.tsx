@@ -28,8 +28,13 @@ function hourLabel(h: number) {
   return `${displayHour}:00 ${suffix}`;
 }
 
+const toYMD = (d: Date) =>
+  `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+
+const HOUR_PX = 56;
+
 export default function Calendar() {
-  const { state } = useStore();
+  const { state, dispatch } = useStore();
   const navigate = useNavigate();
   const now = new Date();
   const contexts = activeContexts(state);
@@ -39,7 +44,57 @@ export default function Calendar() {
   const [selectedDay, setSelectedDay] = useState<Date>(now);
   const [filterCtx, setFilterCtx] = useState<string>('all');
   const [addOpen, setAddOpen] = useState(false);
+  const [addPreset, setAddPreset] = useState<{ date?: string; start?: string }>({});
+  const [drag, setDrag] = useState<{ id: string; dy: number } | null>(null);
+  const dragRef = useRef<{ id: string; startY: number; origStart: Date; duration: number } | null>(null);
   const gridRef = useRef<HTMLDivElement>(null);
+
+  function openAdd(day: Date, start?: string) {
+    setAddPreset({ date: toYMD(day), start });
+    setAddOpen(true);
+  }
+
+  function onEventPointerDown(e: React.PointerEvent, b: Block) {
+    e.stopPropagation();
+    (e.currentTarget as Element).setPointerCapture(e.pointerId);
+    const s = new Date(b.scheduled_start);
+    dragRef.current = {
+      id: b.id,
+      startY: e.clientY,
+      origStart: s,
+      duration: new Date(b.scheduled_end).getTime() - s.getTime(),
+    };
+    setDrag({ id: b.id, dy: 0 });
+  }
+  function onEventPointerMove(e: React.PointerEvent, id: string) {
+    if (dragRef.current?.id !== id) return;
+    setDrag({ id, dy: e.clientY - dragRef.current.startY });
+  }
+  function onEventPointerUp(e: React.PointerEvent) {
+    const d = dragRef.current;
+    dragRef.current = null;
+    setDrag(null);
+    if (!d) return;
+    const deltaMin = Math.round((((e.clientY - d.startY) / HOUR_PX) * 60) / 15) * 15; // snap to 15 min
+    if (deltaMin === 0) return;
+    const raw = new Date(d.origStart.getTime() + deltaMin * 60000);
+    // Keep the event within the same calendar day it started on.
+    const dayStart = new Date(raw.getFullYear(), raw.getMonth(), raw.getDate(), 0, 0, 0, 0).getTime();
+    const maxStart = dayStart + 24 * 3600000 - d.duration;
+    const nsMs = Math.max(dayStart, Math.min(maxStart, raw.getTime()));
+    const ns = new Date(nsMs);
+    const ne = new Date(nsMs + d.duration);
+    dispatch({
+      type: 'UPDATE_BLOCK',
+      payload: { id: d.id, patch: { scheduled_start: ns.toISOString(), scheduled_end: ne.toISOString() } },
+    });
+  }
+  function onDayColumnClick(e: React.MouseEvent) {
+    if (drag) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const hour = Math.max(0, Math.min(23, Math.floor((e.clientY - rect.top) / HOUR_PX)));
+    openAdd(cursor, `${String(hour).padStart(2, '0')}:00`);
+  }
 
   const filterBlocks = (blocks: Block[]) =>
     filterCtx === 'all' ? blocks : blocks.filter((b) => b.context_id === filterCtx);
@@ -119,11 +174,11 @@ export default function Calendar() {
 
   function eventTop(b: Block) {
     const s = new Date(b.scheduled_start);
-    return (s.getHours() + s.getMinutes() / 60) * 56; // 56px per hour row
+    return (s.getHours() + s.getMinutes() / 60) * HOUR_PX;
   }
   function eventHeight(b: Block) {
     const mins = (new Date(b.scheduled_end).getTime() - new Date(b.scheduled_start).getTime()) / 60000;
-    return Math.max(24, (mins / 60) * 56);
+    return Math.max(24, (mins / 60) * HOUR_PX);
   }
 
   return (
@@ -146,7 +201,10 @@ export default function Calendar() {
                 </button>
               ))}
             </div>
-            <button className={styles.newEventBtn} onClick={() => setAddOpen(true)}>
+            <button
+              className={styles.newEventBtn}
+              onClick={() => openAdd(view === 'month' ? selectedDay : cursor)}
+            >
               <IconPlus size={14} /> New event
             </button>
           </div>
@@ -308,6 +366,7 @@ export default function Calendar() {
               <button className={styles.navBtn} onClick={() => shift(1)} aria-label="Next day">
                 <IconChevronRight size={18} />
               </button>
+              <span className={styles.dayHint}>Drag an event to reschedule · click a slot to add</span>
             </div>
             <div className={styles.gridCard}>
               <div className={styles.gridBody} ref={gridRef}>
@@ -318,23 +377,29 @@ export default function Calendar() {
                     </div>
                   ))}
                 </div>
-                <div className={`${styles.dayColumn} ${styles.dayColumnWide}`}>
+                <div className={`${styles.dayColumn} ${styles.dayColumnWide}`} onClick={onDayColumnClick}>
                   {HOURS.map((h) => (
                     <div key={h} className={styles.gridLine} />
                   ))}
                   {dayBlocks.map((b) => {
                     const ctx = ctxFor(b.context_id);
                     const colors = ctx ? colorsFor(ctx.color_key) : undefined;
+                    const isDragging = drag?.id === b.id;
                     return (
                       <div
                         key={b.id}
-                        className={styles.dayEvent}
+                        className={`${styles.dayEvent} ${styles.dayEventDraggable} ${isDragging ? styles.dayEventDragging : ''}`}
                         style={{
                           top: eventTop(b),
                           height: eventHeight(b),
                           background: colors?.tint,
                           borderLeft: `4px solid ${colors?.base}`,
+                          transform: isDragging ? `translateY(${drag!.dy}px)` : undefined,
                         }}
+                        onClick={(e) => e.stopPropagation()}
+                        onPointerDown={(e) => onEventPointerDown(e, b)}
+                        onPointerMove={(e) => onEventPointerMove(e, b.id)}
+                        onPointerUp={onEventPointerUp}
                       >
                         <div className={styles.weekEventTitle} style={{ color: colors?.deep }}>
                           {b.title}
@@ -530,8 +595,21 @@ export default function Calendar() {
       </aside>
 
       {addOpen && (
-        <Modal title="Add a block" onClose={() => setAddOpen(false)}>
-          <AddBlockForm onDone={() => setAddOpen(false)} />
+        <Modal
+          title="Add a block"
+          onClose={() => {
+            setAddOpen(false);
+            setAddPreset({});
+          }}
+        >
+          <AddBlockForm
+            defaultDate={addPreset.date}
+            defaultStart={addPreset.start}
+            onDone={() => {
+              setAddOpen(false);
+              setAddPreset({});
+            }}
+          />
         </Modal>
       )}
     </div>

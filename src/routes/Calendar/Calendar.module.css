@@ -360,6 +360,27 @@
   overflow: hidden;
 }
 
+.dayEventDraggable {
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  transition: box-shadow 0.12s ease;
+}
+
+.dayEventDraggable:active {
+  cursor: grabbing;
+}
+
+.dayEventDragging {
+  z-index: 5;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
+  cursor: grabbing;
+}
+
+.dayColumnWide {
+  cursor: copy;
+}
+
 .weekEventTitle {
   font-size: 11px;
   font-weight: 700;
@@ -386,6 +407,12 @@
   font-size: 16px;
   font-weight: 800;
   color: var(--ink);
+}
+
+.dayHint {
+  margin-left: auto;
+  font-size: 11.5px;
+  color: var(--muted-2);
 }
 
 /* Glance card (month) */

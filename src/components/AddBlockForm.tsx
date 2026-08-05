@@ -18,9 +18,15 @@ const SOURCE_OPTIONS: { value: BlockSourceType; label: string }[] = [
  */
 export default function AddBlockForm({
   goalId,
+  defaultDate,
+  defaultStart,
   onDone,
 }: {
   goalId?: string;
+  /** YYYY-MM-DD to prefill the date field (e.g. from the Calendar day view). */
+  defaultDate?: string;
+  /** HH:MM to prefill the start time; end defaults to one hour later. */
+  defaultStart?: string;
   onDone: () => void;
 }) {
   const { state, dispatch } = useStore();
@@ -34,9 +40,13 @@ export default function AddBlockForm({
   const [selectedSystemId, setSelectedSystemId] = useState(systems[0]?.id || '');
   const [selectedContextId, setSelectedContextId] = useState(contexts[0]?.id || '');
   const [title, setTitle] = useState('');
-  const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
-  const [start, setStart] = useState('09:00');
-  const [end, setEnd] = useState('10:00');
+  const [date, setDate] = useState(() => defaultDate || new Date().toISOString().slice(0, 10));
+  const [start, setStart] = useState(defaultStart || '09:00');
+  const [end, setEnd] = useState(() => {
+    if (!defaultStart) return '10:00';
+    const [h, m] = defaultStart.split(':').map(Number);
+    return `${String((h + 1) % 24).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+  });
 
   const canSubmit = title.trim().length > 0;
 

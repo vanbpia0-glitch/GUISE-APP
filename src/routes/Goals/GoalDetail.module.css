@@ -1,8 +1,12 @@
 .page {
   flex: 1;
   overflow-y: auto;
-  background: var(--canvas-bg);
+  background: #fff;
   padding: 26px 40px;
+}
+
+.page::-webkit-scrollbar {
+  display: none;
 }
 
 .back {
