@@ -114,11 +114,6 @@ export default function Stats() {
 
   const monthDate = new Date(now.getFullYear(), now.getMonth() + monthOffset, 1);
   const consistency = monthlyConsistency(state, monthDate.getFullYear(), monthDate.getMonth(), now);
-  const firstWeekday = new Date(monthDate.getFullYear(), monthDate.getMonth(), 1).getDay();
-  const heatCells: { hours: number; date: Date }[] = [
-    ...Array.from({ length: firstWeekday }, () => ({ hours: -1, date: monthDate })),
-    ...consistency.days,
-  ];
 
   // Current daily active streak: consecutive active days ending at today (or the last day of the viewed month).
   const activeStreakDays = (() => {
@@ -130,6 +125,19 @@ export default function Stats() {
       idx--;
     }
     return run;
+  })();
+
+  // Compact 3-row (21-day, Sunday-aligned) heatmap window ending in the viewed month's last week.
+  const heat21 = (() => {
+    const refDay = monthOffset === 0 ? new Date(now) : new Date(monthDate.getFullYear(), monthDate.getMonth() + 1, 0);
+    refDay.setHours(0, 0, 0, 0);
+    const winSaturday = addDays(refDay, 6 - refDay.getDay());
+    const winStart = addDays(winSaturday, -20);
+    return Array.from({ length: 21 }, (_, i) => {
+      const date = addDays(winStart, i);
+      const mins = blocksOnDay(state, date).reduce((s, b) => s + blockActualMinutes(state, b, now), 0);
+      return { date, hours: Math.round((mins / 60) * 10) / 10 };
+    });
   })();
 
   const reflection = reflectionForWeek(state, weekStart);
@@ -639,14 +647,18 @@ export default function Stats() {
                 ))}
               </div>
               <div className={styles.heatmapGrid}>
-                {heatCells.map((cell, i) => (
+                {heat21.map((cell, i) => (
                   <div
                     key={i}
-                    className={`${styles.heatCell} ${cell.hours >= 0 && isSameDay(cell.date, now) ? styles.heatCellToday : ''}`}
+                    className={`${styles.heatCell} ${isSameDay(cell.date, now) ? styles.heatCellToday : ''}`}
                     style={{ background: heatColor(cell.hours) }}
-                    title={cell.hours >= 0 ? `${cell.date.toDateString()}: ${cell.hours}h` : undefined}
+                    title={`${cell.date.toDateString()}: ${cell.hours}h`}
                   />
                 ))}
+              </div>
+              <div className={styles.heatFooter}>
+                <span>{consistency.activeDays} of {consistency.days.length} days active this month</span>
+                <span className={styles.heatFooterAccent}>Today outlined</span>
               </div>
             </div>
             <div className={styles.consistencySide}>

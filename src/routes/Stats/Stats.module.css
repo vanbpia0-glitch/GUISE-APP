@@ -677,12 +677,26 @@
 
 .heatCell {
   aspect-ratio: 1;
-  border-radius: 6px;
+  border-radius: 12px;
   background: rgba(41, 39, 35, 0.08);
 }
 
 .heatCellToday {
   box-shadow: 0 0 0 2px var(--ink);
+}
+
+.heatFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 16px;
+  font-size: 11px;
+  color: var(--ink-soft);
+}
+
+.heatFooterAccent {
+  color: var(--grounds-mid);
+  font-weight: 600;
 }
 
 .consistencySide {
