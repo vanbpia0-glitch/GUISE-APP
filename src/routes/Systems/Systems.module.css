@@ -329,6 +329,38 @@
   color: var(--muted);
 }
 
+.reminderRow {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.reminderIconBox {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--r-sm);
+  background: var(--me-tint);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.reminderLabel {
+  font-size: 11px;
+  color: var(--muted-2);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  margin-bottom: 4px;
+}
+
+.reminderText {
+  font-size: 13px;
+  color: var(--ink-soft);
+  line-height: 1.45;
+}
+
 .rhythmCard,
 .byDomainCard {
   backdrop-filter: blur(20px);
@@ -423,6 +455,12 @@
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   gap: 10px 0;
+}
+
+.calMonthGrid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 12px 0;
 }
 
 .calDayCell {

@@ -17,6 +17,7 @@ import {
   IconChevronLeft,
   IconChevronRight,
   IconEdit,
+  IconFeather,
   IconFlame,
   IconPlus,
   IconRefresh,
@@ -84,10 +85,38 @@ export default function Systems() {
     return seg;
   });
 
-  // Mini-calendar: per-weekday domain dots from completed systems this week.
-  const calDots = weekDays.map((_, i) =>
-    occBySystem.filter(({ occ }) => occ[i] === 'done').map(({ s }) => DOMAIN_COLORS[s.domain]).slice(0, 3)
-  );
+  // "A reminder": first system day that was due this week but not done (in the past).
+  const missedReminder = (() => {
+    for (const { s, occ } of occBySystem) {
+      for (let i = 0; i < 7; i++) {
+        const day = addDays(weekStart, i);
+        if (occ[i] === 'scheduled' && day.getTime() < now.getTime()) {
+          return { title: s.title, day: day.toLocaleDateString(undefined, { weekday: 'long' }) };
+        }
+      }
+    }
+    return null;
+  })();
+
+  // Full-month calendar grid with per-day domain dots from completed system blocks.
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+  const leadingBlanks = (monthStart.getDay() + 6) % 7; // Monday-first offset
+  const monthCells: ({ date: Date; dots: string[] } | null)[] = [
+    ...Array.from({ length: leadingBlanks }, () => null),
+    ...Array.from({ length: daysInMonth }, (_, i) => {
+      const date = new Date(now.getFullYear(), now.getMonth(), i + 1);
+      const dots = recurring
+        .filter((s) =>
+          Object.values(state.blocks).some(
+            (b) => b.system_id === s.id && b.completed_at && isSameDay(new Date(b.completed_at), date)
+          )
+        )
+        .map((s) => DOMAIN_COLORS[s.domain])
+        .slice(0, 3);
+      return { date, dots };
+    }),
+  ];
   const monthLabel = now.toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
 
   return (
@@ -149,19 +178,20 @@ export default function Systems() {
               </span>
             ))}
           </div>
-          <div className={styles.calWeek}>
-            {weekDays.map((d, i) => {
-              const today = isSameDay(d, now);
+          <div className={styles.calMonthGrid}>
+            {monthCells.map((cell, i) => {
+              if (!cell) return <div key={i} className={styles.calDayCell} />;
+              const today = isSameDay(cell.date, now);
               return (
                 <div key={i} className={styles.calDayCell}>
                   {today ? (
-                    <div className={styles.calToday}>{d.getDate()}</div>
+                    <div className={styles.calToday}>{cell.date.getDate()}</div>
                   ) : (
-                    <div className={styles.calDayNum}>{d.getDate()}</div>
+                    <div className={styles.calDayNum}>{cell.date.getDate()}</div>
                   )}
-                  {!today && calDots[i].length > 0 && (
+                  {!today && cell.dots.length > 0 && (
                     <div className={styles.calDotRow}>
-                      {calDots[i].map((c, j) => (
+                      {cell.dots.map((c, j) => (
                         <span key={j} className={styles.calDot} style={{ background: c }} />
                       ))}
                     </div>
@@ -184,19 +214,25 @@ export default function Systems() {
       <div className={styles.middle}>
         <svg className={styles.middleBg} viewBox="0 0 480 1700" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
           <rect width="480" height="1700" fill="var(--van-tint)" />
-          <g fill="none" stroke="var(--sc-base)" strokeWidth="95" strokeLinecap="round" strokeLinejoin="round" opacity="0.28">
-            <path d="M-40 60 C 40 10, 60 120, 140 90 S 260 -10, 320 60 S 420 160, 500 100" />
-            <path d="M-40 280 C 60 320, 100 220, 180 260 S 300 360, 380 290 S 460 200, 520 280" />
-            <path d="M-40 500 C 40 460, 90 560, 170 520 S 290 440, 360 510 S 450 600, 520 520" />
-            <path d="M-40 720 C 60 760, 110 670, 190 710 S 310 790, 380 720 S 460 650, 520 720" />
-            <path d="M-40 940 C 40 900, 90 990, 170 950 S 300 880, 370 950 S 450 1030, 520 960" />
-            <path d="M-40 1160 C 60 1200, 110 1110, 190 1150 S 310 1230, 380 1160 S 460 1090, 520 1160" />
-            <path d="M-40 1380 C 40 1340, 90 1430, 170 1390 S 300 1320, 370 1390 S 450 1470, 520 1400" />
-            <path d="M-40 1600 C 60 1640, 110 1550, 190 1590 S 310 1670, 380 1600 S 460 1530, 520 1600" />
+          <g fill="var(--sc-base)" opacity="0.22">
+            <path d="M120 40 C 210 -10 300 30 300 110 C 300 190 220 220 150 200 C 70 178 40 90 120 40 Z" />
+            <path d="M370 210 C 450 190 500 260 470 330 C 445 390 360 400 320 350 C 278 296 300 228 370 210 Z" />
+            <path d="M90 360 C 170 330 250 380 235 460 C 222 528 140 550 90 505 C 38 458 22 388 90 360 Z" />
+            <path d="M330 560 C 420 540 470 620 430 690 C 396 748 315 745 285 685 C 256 626 262 578 330 560 Z" />
+            <path d="M130 720 C 220 695 295 755 270 835 C 249 900 160 910 115 855 C 72 803 62 745 130 720 Z" />
+            <path d="M360 900 C 445 885 495 960 460 1030 C 430 1088 350 1090 315 1035 C 282 982 292 916 360 900 Z" />
+            <path d="M100 1080 C 190 1055 270 1115 245 1195 C 224 1262 135 1272 92 1215 C 52 1162 42 1105 100 1080 Z" />
+            <path d="M350 1260 C 440 1240 495 1315 458 1388 C 427 1448 345 1450 310 1392 C 278 1338 285 1280 350 1260 Z" />
+            <path d="M120 1420 C 210 1398 288 1460 262 1540 C 240 1606 150 1614 108 1556 C 68 1502 58 1444 120 1420 Z" />
+            <path d="M360 1580 C 445 1562 500 1636 465 1706 C 436 1762 352 1760 318 1704 C 286 1650 294 1596 360 1580 Z" />
           </g>
-          <g fill="none" stroke="var(--sc-base)" strokeWidth="70" strokeLinecap="round" strokeLinejoin="round" opacity="0.22">
-            <path d="M100 -40 C 140 40, 60 80, 100 160 S 180 260, 130 340 S 60 440, 110 520 S 190 600, 140 680 S 70 780, 120 860 S 200 940, 150 1020 S 80 1120, 130 1200 S 210 1300, 160 1400 S 90 1480, 140 1560 S 200 1650, 150 1700" />
-            <path d="M340 -40 C 300 60, 380 100, 340 180 S 260 280, 310 360 S 390 460, 340 540 S 270 640, 320 720 S 400 820, 350 900 S 280 1000, 330 1080 S 410 1180, 360 1260 S 290 1360, 340 1440 S 400 1490, 340 1560 S 280 1650, 340 1700" />
+          <g fill="var(--sc-base)" opacity="0.12">
+            <path d="M300 120 C 360 100 410 150 388 210 C 368 262 300 268 268 220 C 238 174 245 140 300 120 Z" />
+            <path d="M150 470 C 210 452 258 502 236 560 C 216 610 150 616 120 570 C 92 526 98 490 150 470 Z" />
+            <path d="M370 730 C 430 714 478 762 456 820 C 436 870 372 876 342 830 C 314 786 320 748 370 730 Z" />
+            <path d="M160 980 C 220 964 266 1012 245 1070 C 226 1120 162 1126 132 1080 C 104 1036 110 998 160 980 Z" />
+            <path d="M340 1140 C 400 1124 446 1172 425 1230 C 406 1280 342 1286 312 1240 C 284 1196 290 1158 340 1140 Z" />
+            <path d="M150 1660 C 210 1644 256 1692 235 1750 C 216 1800 152 1806 122 1760 C 94 1716 100 1678 150 1660 Z" />
           </g>
         </svg>
 
@@ -327,6 +363,20 @@ export default function Systems() {
           </div>
           <div className={styles.rhythmNote}>
             {done} of {due} system day{due === 1 ? '' : 's'} happened this week. That's the data — no grade attached.
+          </div>
+        </div>
+
+        <div className={styles.reminderRow}>
+          <div className={styles.reminderIconBox}>
+            <IconFeather size={16} color="var(--me-mid)" />
+          </div>
+          <div>
+            <div className={styles.reminderLabel}>A reminder</div>
+            <div className={styles.reminderText}>
+              {missedReminder
+                ? `Missed ${missedReminder.title} ${missedReminder.day}? That's information, not failure.`
+                : 'Every system you kept this week was a choice. Off days are data, not failure.'}
+            </div>
           </div>
         </div>
 
