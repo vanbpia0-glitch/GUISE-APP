@@ -120,6 +120,18 @@ export default function Stats() {
     ...consistency.days,
   ];
 
+  // Current daily active streak: consecutive active days ending at today (or the last day of the viewed month).
+  const activeStreakDays = (() => {
+    const todayIdx = consistency.days.findIndex((d) => isSameDay(d.date, now));
+    let idx = todayIdx >= 0 ? todayIdx : consistency.days.length - 1;
+    let run = 0;
+    while (idx >= 0 && consistency.days[idx].hours > 0) {
+      run++;
+      idx--;
+    }
+    return run;
+  })();
+
   const reflection = reflectionForWeek(state, weekStart);
 
   const maxDayMinutes = Math.max(
@@ -642,13 +654,19 @@ export default function Stats() {
                 <div className={styles.sideLabel}>Days active</div>
                 <div className={styles.sideValue}>
                   {consistency.activeDays}
-                  <span style={{ fontSize: 13, color: 'var(--muted-2)', fontWeight: 600 }}> / {consistency.days.length}</span>
+                  <span style={{ fontSize: 18, color: 'var(--muted-2)', fontWeight: 600 }}> / {consistency.days.length}</span>
                 </div>
               </div>
               <div>
                 <div className={styles.sideLabel}>Best day this month</div>
                 <div className={styles.sideValueSmall}>
                   {consistency.bestDay ? consistency.bestDay.date.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' }) : 'None yet'}
+                </div>
+              </div>
+              <div>
+                <div className={styles.sideLabel}>Current active streak</div>
+                <div className={styles.sideValueSmall}>
+                  {activeStreakDays > 0 ? `${activeStreakDays} day${activeStreakDays === 1 ? '' : 's'} running` : 'No active streak'}
                 </div>
               </div>
             </div>
