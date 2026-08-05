@@ -679,7 +679,7 @@ export default function Stats() {
               <div>
                 <div className={styles.sideValue}>
                   {consistency.activeDays}
-                  <span style={{ fontSize: 26, color: 'var(--muted-2)', fontWeight: 600 }}> / {consistency.days.length}</span>
+                  <span style={{ fontSize: 34, color: 'var(--muted-2)', fontWeight: 600 }}> / {consistency.days.length}</span>
                 </div>
               </div>
               <div>
